@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Cool-E{% endblock %}
+
+{% block content %}
+<div class="container"
+    style="padding: 4rem 1rem; display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div class="card" style="width: 100%; max-width: 400px;">
+        <h2 class="text-center mb-4 text-primary">Welcome Back</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom: 1.5rem;">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" name="username" id="id_username" class="form-control" required>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label for="id_password" class="form-label">Password</label>
+                <input type="password" name="password" id="id_password" class="form-control" required>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; font-size: 0.9rem;">
+                <label style="display: flex; align-items: center; cursor: pointer; color: var(--text-secondary);">
+                    <input type="checkbox" style="margin-right: 0.5rem; accent-color: var(--primary);"> Remember me
+                </label>
+                <a href="#" class="text-primary" style="text-decoration: none;">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">Sign In to Cool-E</button>
+        </form>
+
+        <p class="text-center mt-3 text-secondary" style="font-size: 0.9rem;">
+            Don't have an account? <a href="{% url 'signup' %}" class="text-primary" style="font-weight: 500;">Sign
+                up</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

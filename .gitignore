@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+.env
+env/
+venv/
+.antigravity/
+.antigravityignore
+passenger_wsgi.py
+*.log
+.vscode/

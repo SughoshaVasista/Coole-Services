@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms and Conditions - Cool-E{% endblock %}
+
+{% block extra_css %}
+<style>
+    .terms-page {
+        padding: 4rem 1rem;
+        min-height: 70vh;
+    }
+
+    .terms-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .terms-header h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .terms-header p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+    }
+
+    .terms-content {
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 3rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .terms-content h2 {
+        color: var(--primary);
+        font-size: 1.8rem;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .terms-content h2:first-of-type {
+        margin-top: 0;
+    }
+
+    .terms-content h3 {
+        color: var(--text-primary);
+        font-size: 1.3rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .terms-content p {
+        color: var(--text-secondary);
+        line-height: 1.8;
+        margin-bottom: 1rem;
+    }
+
+    .terms-content ul {
+        color: var(--text-secondary);
+        margin-left: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .terms-content ul li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+
+    .last-updated {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+        .terms-content {
+            padding: 2rem 1.5rem;
+        }
+
+        .terms-header h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container terms-page">
+    <div class="terms-header">
+        <h1>Terms and Conditions</h1>
+        <p>Please read these terms carefully before using our service</p>
+    </div>
+
+    <div class="terms-content">
+        <h2>1. Introduction</h2>
+        <p>
+            Welcome to Cool-E. These Terms and Conditions ("Terms") govern your use of our website
+            and services. By accessing or using Cool-E, you agree to be bound by these Terms.
+            If you disagree with any part of these terms, you may not access our service.
+        </p>
+
+        <h2>2. User Accounts</h2>
+        <h3>2.1 Account Creation</h3>
+        <p>
+            To access certain features of our platform, you must register for an account.
+            You agree to provide accurate, current, and complete information during registration.
+        </p>
+        <h3>2.2 Account Security</h3>
+        <p>
+            You are responsible for maintaining the confidentiality of your account credentials
+            and for all activities that occur under your account. You must notify us immediately
+            of any unauthorized access or security breach.
+        </p>
+
+        <h2>3. Services</h2>
+        <h3>3.1 Platform Role</h3>
+        <p>
+            Cool-E acts as an intermediary platform connecting users with independent service providers.
+            We facilitate bookings and payments but do not directly provide the services listed on our platform.
+        </p>
+        <h3>3.2 Service Quality</h3>
+        <p>
+            While we carefully vet all service providers, we are not responsible for the quality,
+            timeliness, or outcome of services provided by independent contractors on our platform.
+        </p>
+        <h3>3.3 Verification</h3>
+        <p>
+            All service providers undergo a verification process including background checks,
+            skill assessments, and reference verification where applicable.
+        </p>
+
+        <h2>4. Payments and Pricing</h2>
+        <h3>4.1 Payment Processing</h3>
+        <p>
+            All payments are processed securely through our platform. We accept major credit cards
+            and other payment methods as indicated during checkout.
+        </p>
+        <h3>4.2 Service Fees</h3>
+        <p>
+            Service providers set their own rates. Cool-E charges a service fee which is included
+            in the total price displayed to users.
+        </p>
+        <h3>4.3 Cancellations and Refunds</h3>
+        <p>
+            Cancellation and refund policies vary by service provider. Please review the specific
+            cancellation policy before booking a service.
+        </p>
+
+        <h2>5. User Conduct</h2>
+        <p>You agree to use the platform only for lawful purposes. You must not:</p>
+        <ul>
+            <li>Violate any local, state, national, or international law</li>
+            <li>Harass, abuse, or harm another person or entity</li>
+            <li>Impersonate any person or entity</li>
+            <li>Use the platform for any fraudulent or illegal activity</li>
+            <li>Interfere with or disrupt the platform or servers</li>
+            <li>Attempt to gain unauthorized access to any portion of the platform</li>
+        </ul>
+
+        <h2>6. Reviews and Ratings</h2>
+        <p>
+            Users may leave reviews and ratings for service providers. Reviews must be honest,
+            accurate, and based on actual experience. We reserve the right to remove reviews
+            that violate our guidelines.
+        </p>
+
+        <h2>7. Intellectual Property</h2>
+        <p>
+            The Cool-E platform, including its content, features, and functionality, is owned by
+            Cool-E and is protected by copyright, trademark, and other intellectual property laws.
+        </p>
+
+        <h2>8. Limitation of Liability</h2>
+        <p>
+            Cool-E shall not be liable for any indirect, incidental, special, consequential, or
+            punitive damages resulting from your use of or inability to use the service.
+        </p>
+
+        <h2>9. Privacy</h2>
+        <p>
+            Your use of the platform is also governed by our Privacy Policy. Please review our
+            Privacy Policy to understand our practices regarding your personal information.
+        </p>
+
+        <h2>10. Termination</h2>
+        <p>
+            We may terminate or suspend your account and access to the service immediately,
+            without prior notice or liability, for any reason, including breach of these Terms.
+        </p>
+
+        <h2>11. Changes to Terms</h2>
+        <p>
+            We reserve the right to modify these Terms at any time. We will notify users of
+            any material changes via email or through the platform.
+        </p>
+
+        <h2>12. Contact Information</h2>
+        <p>
+            If you have any questions about these Terms, please contact us at:
+            <a href="mailto:legal@cool-e.com" style="color: var(--primary);">legal@cool-e.com</a>
+        </p>
+
+        <div class="last-updated">
+            <p>Last Updated: February 2026</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

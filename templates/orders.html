@@ -1,0 +1,1102 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Cool-E{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-page {
+        padding: 3rem 1rem 4rem;
+        min-height: 60vh;
+    }
+
+    .orders-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeInDown 0.6s ease-out;
+    }
+
+    .orders-header h1 {
+        font-size: 2.8rem;
+        margin-bottom: 0.8rem;
+        color: var(--text-primary);
+        font-weight: 700;
+        background: linear-gradient(135deg, #fff 0%, var(--primary-color) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .orders-header p {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+    }
+
+    .orders-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        background: rgba(0, 230, 118, 0.1);
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+        border: 2px solid var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: scaleIn 0.6s ease-out backwards;
+    }
+
+    .stat-item:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .stat-item:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .stat-item:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .stat-item strong {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+    }
+
+    .stat-item span {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .orders-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .order-card {
+        background: var(--surface-color);
+        border: 2px solid #333;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .order-card:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .order-card:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    .order-card:nth-child(4) {
+        animation-delay: 0.3s;
+    }
+
+    .order-card:nth-child(5) {
+        animation-delay: 0.4s;
+    }
+
+    .order-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        border-radius: 20px 0 0 20px;
+        transition: width 0.3s ease;
+    }
+
+    .order-card.pending::before {
+        background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+    }
+
+    .order-card.confirmed::before {
+        background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .order-card.completed::before {
+        background: linear-gradient(180deg, var(--primary-color) 0%, #00c853 100%);
+    }
+
+    .order-card.cancelled::before {
+        background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .order-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 230, 118, 0.25);
+    }
+
+    .order-card:hover::before {
+        width: 10px;
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, rgba(0, 230, 118, 0.08) 0%, rgba(0, 200, 83, 0.08) 100%);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .order-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .order-id {
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        border: 1px solid #333;
+    }
+
+    .order-title h3 {
+        font-size: 1.6rem;
+        color: var(--primary-color);
+        margin: 0;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .category-badge {
+        background: linear-gradient(135deg, #00e676 0%, #00c853 100%);
+        color: #000;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(0, 230, 118, 0.3);
+    }
+
+    .status-badge {
+        padding: 0.5rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-badge::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    .status-pending {
+        background: rgba(251, 191, 36, 0.15);
+        color: #fbbf24;
+        border: 2px solid #fbbf24;
+    }
+
+    .status-pending::before {
+        background: #fbbf24;
+    }
+
+    .status-confirmed {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+        border: 2px solid #3b82f6;
+    }
+
+    .status-confirmed::before {
+        background: #3b82f6;
+    }
+
+    .status-completed {
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .status-completed::before {
+        background: var(--primary-color);
+    }
+
+    .status-cancelled {
+        background: rgba(255, 51, 102, 0.15);
+        color: #ef4444;
+        border: 2px solid #ef4444;
+    }
+
+    .status-cancelled::before {
+        background: #ef4444;
+    }
+
+    .order-body {
+        padding: 2.5rem;
+        display: grid;
+        grid-template-columns: 200px 1fr auto;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    .provider-image-section {
+        text-align: center;
+    }
+
+    .provider-avatar-wrapper {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .provider-avatar {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid var(--primary-color);
+        box-shadow: 0 10px 30px rgba(0, 230, 118, 0.4);
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .provider-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(0, 230, 118, 0.6);
+    }
+
+    .verified-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: var(--primary-color);
+        color: #000;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        font-weight: bold;
+        border: 4px solid var(--surface-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .provider-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(0, 230, 118, 0.15);
+        color: var(--primary-color);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid var(--primary-color);
+    }
+
+    .provider-details {
+        flex: 1;
+    }
+
+    .provider-name {
+        font-size: 1.9rem;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .provider-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 0.6rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #333;
+        transition: all 0.3s ease;
+    }
+
+    .meta-item:hover {
+        background: rgba(0, 230, 118, 0.05);
+        border-color: var(--primary-color);
+        transform: translateX(3px);
+    }
+
+    .meta-icon {
+        font-size: 1.3rem;
+    }
+
+    .meta-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .meta-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .meta-value {
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .rating-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stars {
+        color: #ffd700;
+        font-size: 1rem;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    }
+
+    .rating-text {
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .service-description {
+        background: rgba(0, 230, 118, 0.05);
+        padding: 1.2rem;
+        border-radius: 10px;
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .service-description h4 {
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .service-description p {
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .specialties {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-top: 1rem;
+    }
+
+    .specialty-tag {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .specialty-tag:hover {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: #3b82f6;
+        transform: translateY(-2px);
+    }
+
+    .contact-section {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1.2rem;
+        border-radius: 10px;
+        border: 1px solid #333;
+        margin-top: 1.5rem;
+    }
+
+    .contact-section h4 {
+        color: var(--primary-color);
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: start;
+        gap: 0.6rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .contact-icon {
+        font-size: 1.1rem;
+        margin-top: 0.1rem;
+    }
+
+    .contact-details {
+        flex: 1;
+    }
+
+    .contact-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.2rem;
+    }
+
+    .contact-value {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .contact-value a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .contact-value a:hover {
+        text-decoration: underline;
+        color: var(--primary-hover);
+    }
+
+    .order-pricing {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 200px;
+    }
+
+    .price-display {
+        background: linear-gradient(135deg, rgba(0, 230, 118, 0.15) 0%, rgba(0, 200, 83, 0.15) 100%);
+        padding: 1.8rem;
+        border-radius: 12px;
+        border: 2px solid var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .price-display:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 230, 118, 0.3);
+    }
+
+    .price-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .price-amount {
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        font-family: var(--font-accent);
+        line-height: 1;
+    }
+
+    .price-unit {
+        font-size: 1rem;
+        color: var(--text-secondary);
+    }
+
+    .booking-info {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1.2rem;
+        border-radius: 10px;
+        border: 1px solid #333;
+    }
+
+    .booking-info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .booking-info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .booking-info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+    }
+
+    .booking-info-value {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+
+    .action-btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        cursor: pointer;
+    }
+
+    .action-btn-primary {
+        background: var(--primary-color);
+        color: #000;
+        border-color: var(--primary-color);
+    }
+
+    .action-btn-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+    }
+
+    .action-btn-secondary {
+        background: transparent;
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .action-btn-secondary:hover {
+        background: rgba(0, 230, 118, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--surface-color);
+        border: 2px dashed #333;
+        border-radius: 20px;
+        margin: 2rem 0;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .empty-state-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.6;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .empty-state h3 {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.5;
+            transform: scale(1.2);
+        }
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    @media (max-width: 968px) {
+        .order-body {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .provider-image-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .provider-avatar {
+            width: 120px;
+            height: 120px;
+            font-size: 3rem;
+        }
+
+        .order-pricing {
+            text-align: left;
+        }
+
+        .provider-name {
+            font-size: 1.5rem;
+        }
+
+        .price-amount {
+            font-size: 2rem;
+        }
+
+        .provider-meta {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .orders-header h1 {
+            font-size: 2rem;
+        }
+
+        .order-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .order-title {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .order-title h3 {
+            font-size: 1.3rem;
+        }
+
+        .order-body {
+            padding: 1.5rem;
+        }
+
+        .provider-avatar-wrapper {
+            margin: 0 auto 1rem;
+        }
+
+        .provider-image-section {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .orders-stats {
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container orders-page">
+    <div class="orders-header">
+        <h1>My Bookings & Orders</h1>
+        <p>Track and manage all your service bookings in one place</p>
+
+        <div class="orders-stats">
+            <div class="stat-item">
+                <strong>{{ bookings.count }}</strong>
+                <span>Total Bookings</span>
+            </div>
+            <div class="stat-item">
+                <strong>{{ bookings|length }}</strong>
+                <span>Active Orders</span>
+            </div>
+            <div class="stat-item">
+                <strong>{{ bookings|length }}</strong>
+                <span>Providers</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="orders-container">
+        {% for booking in bookings %}
+        <div class="order-card {{ booking.status }}">
+            <!-- Order Header -->
+            <div class="order-header">
+                <div class="order-title">
+                    <span class="order-id">#{{ booking.id|stringformat:"05d" }}</span>
+                    <h3>
+                        <span>📋</span>
+                        {{ booking.provider.category.name }}
+                    </h3>
+                    <span class="category-badge">{{ booking.provider.category.name|upper }}</span>
+                </div>
+                <span class="status-badge status-{{ booking.status }}">
+                    {{ booking.get_status_display }}
+                </span>
+            </div>
+
+            <!-- Order Body -->
+            <div class="order-body">
+                <!-- Provider Image Section -->
+                <div class="provider-image-section">
+                    <div class="provider-avatar-wrapper">
+                        {% if booking.provider.profile_pic %}
+                        <img src="{{ booking.provider.profile_pic.url }}" alt="{{ booking.provider.user.username }}"
+                            class="provider-avatar">
+                        {% else %}
+                        <div class="provider-avatar">
+                            👤
+                        </div>
+                        {% endif %}
+                        <div class="verified-badge">✓</div>
+                    </div>
+                    <span class="provider-status">
+                        <span>●</span>
+                        <span>Verified Pro</span>
+                    </span>
+                </div>
+
+                <!-- Provider Details -->
+                <div class="provider-details">
+                    <h2 class="provider-name">
+                        {{ booking.provider.user.first_name }} {{ booking.provider.user.last_name }}
+                    </h2>
+
+                    <div class="provider-meta">
+                        <div class="meta-item">
+                            <span class="meta-icon">📞</span>
+                            <div class="meta-content">
+                                <span class="meta-label">Phone</span>
+                                <span class="meta-value">
+                                    {% if booking.provider.contact_number %}
+                                        {{ booking.provider.contact_number }}
+                                    {% elif booking.provider.user.userprofile.phone_number %}
+                                        {{ booking.provider.user.userprofile.phone_number }}
+                                    {% else %}
+                                        Not Provided
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-icon">📋</span>
+                            <div class="meta-content">
+                                <span class="meta-label">Service Code</span>
+                                <span class="meta-value">{{ booking.provider.service_code }}</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-icon">🎂</span>
+                            <div class="meta-content">
+                                <span class="meta-label">Age</span>
+                                <span class="meta-value">{{ booking.provider.age }} years</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-icon">⭐</span>
+                            <div class="meta-content">
+                                <span class="meta-label">Rating</span>
+                                <div class="rating-display">
+                                    <span class="stars">★★★★★</span>
+                                    <span class="rating-text">{{ booking.provider.rating }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-description">
+                        <h4>About This Provider</h4>
+                        <p>{{ booking.provider.description|truncatewords:30 }}</p>
+                    </div>
+
+                    <div class="specialties">
+                        {% if "Women" in booking.provider.category.name %}
+                        <span class="specialty-tag">💇 Hair Styling</span>
+                        <span class="specialty-tag">💄 Makeup</span>
+                        <span class="specialty-tag">✨ Facial</span>
+                        {% elif "Men" in booking.provider.category.name %}
+                        <span class="specialty-tag">✂️ Classic Cuts</span>
+                        <span class="specialty-tag">🧔 Beard Grooming</span>
+                        <span class="specialty-tag">🪒 Hot Towel Shave</span>
+                        {% elif "Cleaning" in booking.provider.category.name %}
+                        <span class="specialty-tag">🧹 Deep Cleaning</span>
+                        <span class="specialty-tag">🌿 Eco-Friendly</span>
+                        <span class="specialty-tag">📦 Move-in/out</span>
+                        {% elif "Electrician" in booking.provider.category.name %}
+                        <span class="specialty-tag">⚡ Wiring</span>
+                        <span class="specialty-tag">🔌 Circuit Repair</span>
+                        <span class="specialty-tag">🛡️ Safety Inspection</span>
+                        {% elif "Painting" in booking.provider.category.name %}
+                        <span class="specialty-tag">🏠 Interior</span>
+                        <span class="specialty-tag">🏡 Exterior</span>
+                        <span class="specialty-tag">🎨 Texture Work</span>
+                        {% elif "AC" in booking.provider.category.name %}
+                        <span class="specialty-tag">🔧 Repair</span>
+                        <span class="specialty-tag">❄️ Installation</span>
+                        <span class="specialty-tag">🔄 Maintenance</span>
+                        {% else %}
+                        <span class="specialty-tag">✅ Professional Service</span>
+                        <span class="specialty-tag">⭐ Quality Work</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="contact-section">
+                        <h4>📞 Contact Information</h4>
+                        <div class="contact-grid">
+                            <div class="contact-item">
+                                <span class="contact-icon">📱</span>
+                                <div class="contact-details">
+                                    <div class="contact-label">Phone Number</div>
+                                    <div class="contact-value">
+                                        {% if booking.provider.contact_number %}
+                                            <a href="tel:{{ booking.provider.contact_number }}">{{ booking.provider.contact_number }}</a>
+                                        {% elif booking.provider.user.userprofile.phone_number %}
+                                            <a href="tel:{{ booking.provider.user.userprofile.phone_number }}">{{ booking.provider.user.userprofile.phone_number }}</a>
+                                        {% else %}
+                                            <span class="text-muted">Not Available</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-icon">📍</span>
+                                <div class="contact-details">
+                                    <div class="contact-label">Provider Address</div>
+                                    <div class="contact-value">{{ booking.provider.address|default:"Professional Service" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if booking.service_location or booking.notes %}
+                    <div class="booking-details-box" style="margin-top: 1.5rem; padding: 1.2rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid #333;">
+                        <h4 style="color: var(--primary-color); font-size: 0.95rem; margin-bottom: 0.8rem;">📝 Your Booking Details</h4>
+                        
+                        {% if booking.service_location %}
+                        <div style="margin-bottom: 0.8rem;">
+                            <span style="color: #888; font-size: 0.85rem; display: block;">Service Location:</span>
+                            <span style="color: #fff; font-size: 0.95rem;">📍 {{ booking.service_location }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if booking.notes %}
+                        <div>
+                            <span style="color: #888; font-size: 0.85rem; display: block;">Notes/Requirements:</span>
+                            <span style="color: #eee; font-size: 0.9rem; font-style: italic;">"{{ booking.notes }}"</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Pricing & Booking Info -->
+                <div class="order-pricing">
+                    <div class="price-display">
+                        <div class="price-label">Hourly Rate</div>
+                        <div class="price-amount">
+                            ₹{{ booking.provider.price_per_hour }}
+                            <span class="price-unit">/hr</span>
+                        </div>
+                    </div>
+
+                    <div class="booking-info">
+                        <div class="booking-info-item">
+                            <span>📅</span>
+                            <div>
+                                <div class="booking-info-label">Booking Date</div>
+                                <div class="booking-info-value">{{ booking.booking_date|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                        <div class="booking-info-item">
+                            <span>🕐</span>
+                            <div>
+                                <div class="booking-info-label">Time Slot</div>
+                                <div class="booking-info-value">{{ booking.booking_date|date:"h:i A" }}</div>
+                            </div>
+                        </div>
+                        <div class="booking-info-item">
+                            <span>📆</span>
+                            <div>
+                                <div class="booking-info-label">Booked On</div>
+                                <div class="booking-info-value">{{ booking.created_at|date:"M d, Y" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="tel:{{ booking.provider.contact_number }}" class="action-btn action-btn-primary">
+                            📞 Call Provider
+                        </a>
+                        
+                        {% if booking.status == 'pending' %}
+                            <a href="{% url 'pay_via_upi' booking.id %}" class="action-btn action-btn-primary" style="background: #28a745; border-color: #28a745; color: white; margin-bottom: 0.5rem; display: block;">
+                                📱 Pay via UPI (₹{{ booking.provider.price_per_hour }})
+                            </a>
+                            <form method="post" action="{% url 'cancel_booking' booking.id %}" onsubmit="return confirm('Are you sure you want to cancel this booking?');" style="width: 100%;">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn action-btn-secondary" style="width: 100%; color: #dc3545; border-color: #dc3545; background: rgba(220, 53, 69, 0.1);">
+                                    ❌ Cancel Booking
+                                </button>
+                            </form>
+                        {% elif booking.status == 'confirmed' %}
+                             <form method="post" action="{% url 'complete_booking' booking.id %}" onsubmit="return confirm('Confirm that the service has been completed?');" style="width: 100%;">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn action-btn-secondary" style="width: 100%; color: #28a745; border-color: #28a745; background: rgba(40, 167, 69, 0.1);">
+                                    ✅ Mark Complete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    {% if booking.status == 'completed' %}
+                        {% if not booking.review_stars %}
+                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #333;">
+                                <h4 style="font-size: 0.9rem; color: var(--primary-color); margin-bottom: 0.5rem;">Write a Review</h4>
+                                <form method="post" action="{% url 'submit_review' booking.id %}">
+                                    {% csrf_token %}
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <select name="rating" required style="width: 100%; padding: 0.5rem; background: rgba(0,0,0,0.3); color: #fff; border: 1px solid #444; border-radius: 8px;">
+                                            <option value="" disabled selected>Select Rating</option>
+                                            <option value="5">★★★★★ Excellent (5)</option>
+                                            <option value="4">★★★★☆ Good (4)</option>
+                                            <option value="3">★★★☆☆ Average (3)</option>
+                                            <option value="2">★★☆☆☆ Poor (2)</option>
+                                            <option value="1">★☆☆☆☆ Terrible (1)</option>
+                                        </select>
+                                    </div>
+                                    <textarea name="review_text" placeholder="Share your experience..." rows="2" style="width: 100%; background: rgba(0,0,0,0.3); color: #fff; border: 1px solid #444; border-radius: 8px; padding: 0.5rem; margin-bottom: 0.5rem; resize: vertical;"></textarea>
+                                    <button type="submit" class="action-btn action-btn-primary" style="width: 100%; font-size: 0.9rem;">Submit Review</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div style="margin-top: 1rem; padding: 0.8rem; background: rgba(0, 230, 118, 0.1); border-radius: 8px; border: 1px solid var(--primary-color);">
+                                <div style="color: var(--primary-color); font-weight: bold; font-size: 0.9rem; margin-bottom: 0.3rem;">✓ You rated this {{ booking.review_stars }}/5</div>
+                                <p style="font-size: 0.85rem; color: #ddd; margin: 0; font-style: italic;">"{{ booking.review_text }}"</p>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <h3>No Bookings Yet</h3>
+            <p>Start exploring our services and book your first professional today!<br>Quality service providers are
+                waiting to help you.</p>
+            <a href="{% url 'services' %}" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.8rem 2rem;">
+                🔍 Browse Services
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

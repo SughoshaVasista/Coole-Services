@@ -1,0 +1,819 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} Providers - Cool-E{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Category Hero Section */
+    .category-hero {
+        position: relative;
+        min-height: 480px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        color: white;
+        text-align: left;
+        overflow: hidden;
+        margin-bottom: 3rem;
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0, 230, 118, 0.2);
+        animation: fadeInDown 0.6s ease-out;
+    }
+
+    .category-hero img.hero-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -2;
+        animation: kenburns 30s ease-in-out infinite alternate;
+    }
+
+    @keyframes kenburns {
+        0% {
+            transform: scale(1);
+        }
+
+        100% {
+            transform: scale(1.1);
+        }
+    }
+
+    .category-hero .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right,
+                rgba(0, 0, 0, 0.95) 0%,
+                rgba(0, 0, 0, 0.75) 50%,
+                rgba(0, 0, 0, 0.4) 100%);
+        z-index: -1;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        padding: 3.5rem 4rem;
+        animation: slideInLeft 0.8s ease-out;
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .hero-content h1 {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        font-weight: 800;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+        line-height: 1.1;
+        background: linear-gradient(135deg, #fff 0%, var(--primary-color) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .provider-count-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(0, 230, 118, 0.2);
+        color: var(--primary-color);
+        padding: 0.6rem 1.2rem;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        border: 2px solid var(--primary-color);
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .provider-count-badge::before {
+        content: '✓';
+        font-size: 1.2rem;
+    }
+
+    .services-included {
+        margin-top: 2rem;
+        background: rgba(0, 0, 0, 0.75);
+        padding: 2rem;
+        border-radius: 16px;
+        border: 2px solid rgba(0, 230, 118, 0.3);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .services-included h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1.2rem;
+        color: var(--primary-color);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .services-included h3::before {
+        content: '✓';
+        display: inline-block;
+        background: var(--primary-color);
+        color: #000;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .services-included ul {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem 2.5rem;
+    }
+
+    .services-included li {
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        color: #eee;
+        transition: all 0.2s ease;
+        padding: 0.3rem 0;
+    }
+
+    .services-included li:hover {
+        color: var(--primary-color);
+        transform: translateX(5px);
+    }
+
+    .services-included li::before {
+        content: "→";
+        color: var(--primary-color);
+        font-weight: bold;
+        margin-right: 0.8rem;
+        font-size: 1.2rem;
+    }
+
+    .services-included ul li a {
+        color: inherit;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    /* Providers Section */
+    .providers-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .section-header {
+        margin-bottom: 3rem;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .category-title {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        color: white;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .category-title::before {
+        content: '';
+        width: 6px;
+        height: 70px;
+        background: linear-gradient(180deg, var(--primary-color) 0%, transparent 100%);
+        border-radius: 10px;
+    }
+
+    .section-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-left: 1.8rem;
+    }
+
+    .providers-grid {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .provider-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2.5rem;
+        background: var(--surface-color);
+        border: 2px solid #333;
+        border-radius: 20px;
+        gap: 2.5rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .provider-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .provider-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .provider-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .provider-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .provider-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    .provider-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(180deg, var(--primary-color) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .provider-card:hover {
+        background: rgba(0, 230, 118, 0.05);
+        transform: translateX(10px);
+        border-color: var(--primary-color);
+        box-shadow: 0 15px 40px rgba(0, 230, 118, 0.25);
+    }
+
+    .provider-card:hover::before {
+        opacity: 1;
+    }
+
+    .provider-info-section {
+        flex: 1;
+    }
+
+    .provider-header {
+        display: flex;
+        align-items: start;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .provider-details {
+        flex: 1;
+    }
+
+    .provider-name {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .provider-meta-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+    }
+
+    .meta-badge:hover {
+        background: rgba(0, 230, 118, 0.1);
+        border-color: var(--primary-color);
+    }
+
+    .rating-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stars {
+        color: #ffd700;
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+
+    .rating-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .price-tag {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .price-tag::before {
+        content: '💰';
+        font-size: 1.3rem;
+    }
+
+    .provider-description {
+        color: #ccc;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+    }
+
+    .provider-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .badge {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .badge:hover {
+        background: rgba(59, 130, 246, 0.25);
+        border-color: #3b82f6;
+        transform: translateY(-2px);
+    }
+
+    .provider-contact {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        border: 1px solid #333;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .contact-icon {
+        font-size: 1.1rem;
+    }
+
+    .contact-value {
+        color: var(--text-primary);
+    }
+
+    .provider-image-section {
+        min-width: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .provider-avatar-wrapper {
+        position: relative;
+    }
+
+    .provider-avatar {
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        background: #1a1a1a;
+        object-fit: cover;
+        border: 5px solid var(--primary-color);
+        box-shadow: 0 10px 30px rgba(0, 230, 118, 0.5);
+        transition: all 0.3s ease;
+    }
+
+    .provider-card:hover .provider-avatar {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(0, 230, 118, 0.7);
+    }
+
+    .verified-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background: var(--primary-color);
+        color: #000;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.3rem;
+        border: 4px solid var(--surface-color);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .book-btn {
+        background: var(--primary-color);
+        color: #000;
+        border: none;
+        padding: 0.9rem 2.5rem;
+        border-radius: 30px;
+        font-weight: 700;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        box-shadow: 0 6px 20px rgba(0, 230, 118, 0.4);
+        text-align: center;
+        width: 100%;
+    }
+
+    .book-btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 230, 118, 0.6);
+    }
+
+    .view-profile-btn {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 0.7rem 2rem;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 0.9rem;
+        text-align: center;
+        width: 100%;
+    }
+
+    .view-profile-btn:hover {
+        background: rgba(0, 230, 118, 0.1);
+        transform: translateY(-3px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--surface-color);
+        border-radius: 20px;
+        border: 2px dashed #333;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .empty-state-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.6;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .empty-state p {
+        color: #aaa;
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state a {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        border: 2px solid var(--primary-color);
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .empty-state a:hover {
+        background: var(--primary-color);
+        color: #000;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 230, 118, 0.4);
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 968px) {
+        .provider-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .services-included ul {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-content {
+            padding: 2.5rem;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+        }
+
+        .category-title {
+            font-size: 2.5rem;
+        }
+
+        .provider-image-section {
+            order: -1;
+        }
+
+        .provider-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .provider-contact {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .hero-content h1 {
+            font-size: 2.2rem;
+        }
+
+        .category-hero {
+            min-height: 380px;
+        }
+
+        .provider-card {
+            padding: 1.8rem;
+        }
+
+        .provider-name {
+            font-size: 1.6rem;
+        }
+
+        .provider-meta-row {
+            flex-direction: column;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .provider-avatar {
+            width: 150px;
+            height: 150px;
+        }
+    }
+</style>
+
+<div class="category-hero">
+    {% if category.image %}
+    <img class="hero-bg" src="{{ category.image.url }}" alt="{{ category.name }}">
+    {% else %}
+    {% if "InstaHelp" in category.name %}
+    <img class="hero-bg" src="{% static 'images/instahelp.png' %}" alt="InstaHelp">
+    {% elif "Women" in category.name %}
+    <img class="hero-bg" src="{% static 'images/Women.jpg' %}" alt="Women's Salon">
+    {% elif "Men" in category.name %}
+    <img class="hero-bg" src="{% static 'images/Mens.jpg' %}" alt="Men's Salon">
+    {% elif "Cleaning" in category.name %}
+    <img class="hero-bg" src="{% static 'images/cleaning.jpg' %}" alt="Cleaning">
+    {% elif "Electrician" in category.name %}
+    <img class="hero-bg" src="{% static 'images/electrician.jpg' %}" alt="Electrician">
+    {% elif "Water" in category.name %}
+    <img class="hero-bg" src="{% static 'images/water.jpg' %}" alt="Water Service">
+    {% elif "Painting" in category.name %}
+    <img class="hero-bg" src="{% static 'images/painting.jpg' %}" alt="Painting">
+    {% elif "AC" in category.name %}
+    <img class="hero-bg" src="{% static 'images/ac.jpg' %}" alt="AC Repair">
+    {% elif "Plumber" in category.name %}
+    <img class="hero-bg" src="{% static 'images/plumber.jpg' %}" alt="Plumber">
+    {% else %}
+    <img class="hero-bg" src="{% static 'images/default.jpg' %}" alt="Default Service">
+    {% endif %}
+    {% endif %}
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+        <h1>{{ category.name }}</h1>
+        <span class="provider-count-badge">{{ providers.count }} Verified Providers Available</span>
+
+        <div class="services-included">
+            <h3>Services Included</h3>
+            <ul>
+                {% if "Water" in category.name %}
+                <li><a href="{% url 'services' %}">RO installation</a></li>
+                <li><a href="{% url 'services' %}">Filter replacement</a></li>
+                <li><a href="{% url 'services' %}">Water quality check</a></li>
+                <li><a href="{% url 'services' %}">Purifier maintenance</a></li>
+                {% elif "Electrician" in category.name or "Plumber" in category.name %}
+                <li><a href="{% url 'services' %}">Switch/socket repair</a></li>
+                <li><a href="{% url 'services' %}">Fan installation</a></li>
+                <li><a href="{% url 'services' %}">Light fixture setup</a></li>
+                <li><a href="{% url 'services' %}">Wiring solutions</a></li>
+                <li><a href="{% url 'services' %}">Tap repair</a></li>
+                <li><a href="{% url 'services' %}">Pipe leakage fix</a></li>
+                {% elif "InstaHelp" in category.name %}
+                <li><a href="{% url 'services' %}">Minor electrical fixes</a></li>
+                <li><a href="{% url 'services' %}">Plumbing leak repair</a></li>
+                <li><a href="{% url 'services' %}">Door lock repair</a></li>
+                <li><a href="{% url 'services' %}">Emergency services</a></li>
+                {% else %}
+                <li><a href="{% url 'services' %}">Professional consultation</a></li>
+                <li><a href="{% url 'services' %}">Quality service delivery</a></li>
+                <li><a href="{% url 'services' %}">Expert assistance</a></li>
+                <li><a href="{% url 'services' %}">Post-service support</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="container providers-container">
+    <div class="section-header">
+        <h1 class="category-title">Available Providers</h1>
+        <p class="section-subtitle">Book trusted professionals ready to serve you</p>
+    </div>
+
+    <div class="providers-grid">
+        {% for provider in providers %}
+        <div class="provider-card">
+            <div class="provider-info-section">
+                <div class="provider-header">
+                    <div class="provider-details">
+                        <h2 class="provider-name">{{ provider.user.first_name }} {{ provider.user.last_name }}</h2>
+
+                        <div class="provider-meta-row">
+                            <span class="meta-badge">
+                                <span>📋</span>
+                                <span>{{ provider.service_code }}</span>
+                            </span>
+                            <span class="meta-badge">
+                                <span>🎂</span>
+                                <span>{{ provider.age }} years</span>
+                            </span>
+                            <div class="rating-badge">
+                                <span class="stars">★★★★★</span>
+                                <span class="rating-value">{{ provider.rating }}/5.0</span>
+                            </div>
+                            <span class="meta-badge">
+                                <span>📍</span>
+                                <span>{{ provider.bookings.count }} bookings</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="price-tag">₹{{ provider.price_per_hour }}/hr</div>
+
+                <p class="provider-description">
+                    {{ provider.description|truncatewords:30 }}
+                </p>
+
+                <div class="provider-badges">
+                    {% if "Women" in provider.category.name %}
+                    <span class="badge">💇 Hair Styling</span>
+                    <span class="badge">💄 Makeup</span>
+                    <span class="badge">✨ Facial</span>
+                    {% elif "Men" in provider.category.name %}
+                    <span class="badge">✂️ Classic Cuts</span>
+                    <span class="badge">🧔 Beard Grooming</span>
+                    <span class="badge">🪒 Hot Towel</span>
+                    {% elif "Cleaning" in provider.category.name %}
+                    <span class="badge">🧹 Deep Cleaning</span>
+                    <span class="badge">🌿 Eco-Friendly</span>
+                    <span class="badge">📦 Move-in/out</span>
+                    {% elif "Electrician" in provider.category.name %}
+                    <span class="badge">⚡ Wiring</span>
+                    <span class="badge">🔌 Circuit Repair</span>
+                    <span class="badge">🛡️ Safety</span>
+                    {% elif "Painting" in provider.category.name %}
+                    <span class="badge">🏠 Interior</span>
+                    <span class="badge">🏡 Exterior</span>
+                    <span class="badge">🎨 Texture Work</span>
+                    {% elif "AC" in provider.category.name %}
+                    <span class="badge">🔧 Repair</span>
+                    <span class="badge">❄️ Installation</span>
+                    <span class="badge">🔄 Maintenance</span>
+                    {% else %}
+                    <span class="badge">✅ Professional</span>
+                    <span class="badge">⭐ Quality Work</span>
+                    {% endif %}
+                </div>
+
+                <div class="provider-contact">
+                    <div class="contact-item">
+                        <span class="contact-icon">📱</span>
+                        <span class="contact-value">{{ provider.contact_number }}</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📍</span>
+                        <span class="contact-value">{{ provider.address|truncatewords:5 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="provider-image-section">
+                <div class="provider-avatar-wrapper">
+                    {% if provider.profile_pic %}
+                    <img src="{{ provider.profile_pic.url }}" alt="{{ provider.user.username }}"
+                        class="provider-avatar">
+                    {% else %}
+                    <div class="provider-avatar"
+                        style="display:flex; align-items:center; justify-content:center; color:#666; font-size:4rem;">
+                        👤
+                    </div>
+                    {% endif %}
+                    <div class="verified-badge">✓</div>
+                </div>
+                <a href="{% url 'provider_detail' provider.id %}" class="book-btn">📅 Book Now</a>
+                <a href="{% url 'provider_detail' provider.id %}" class="view-profile-btn">👤 View Profile</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <p>No providers found in this category yet.</p>
+            <a href="{% url 'services' %}">🏠 Browse other categories</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

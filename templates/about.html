@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - Cool-E{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        text-align: center;
+        padding: 5rem 1rem 3rem;
+        background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    }
+
+    .about-hero h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), #00cc6a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .about-hero p {
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto 2rem;
+        line-height: 1.8;
+    }
+
+    .about-content {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 3rem 1rem;
+    }
+
+    .mission-section {
+        background: var(--bg-card);
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 3rem;
+        margin: 3rem 0;
+        text-align: center;
+    }
+
+    .mission-section h3 {
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+    }
+
+    .mission-section p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+    }
+
+    .contact-section {
+        background: var(--bg-secondary);
+        border-radius: var(--border-radius);
+        padding: 3rem;
+        margin: 3rem 0;
+        text-align: center;
+    }
+
+    .contact-section h3 {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 2rem;
+    }
+
+    .contact-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .contact-method {
+        padding: 1.5rem;
+        background: var(--bg-card);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        transition: var(--transition-base);
+    }
+
+    .contact-method:hover {
+        border-color: var(--primary);
+        transform: translateY(-5px);
+    }
+
+    .contact-method-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .contact-method h4 {
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .contact-method a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: var(--transition-fast);
+    }
+
+    .contact-method a:hover {
+        color: var(--primary);
+    }
+
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin: 3rem 0;
+        flex-wrap: wrap;
+    }
+
+    .social-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        background: var(--bg-card);
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition-base);
+    }
+
+    .social-link:hover {
+        border-color: var(--primary);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .social-link.instagram:hover {
+        border-color: #E1306C;
+        color: #E1306C;
+    }
+
+    .social-link.facebook:hover {
+        border-color: #4267B2;
+        color: #4267B2;
+    }
+
+    .social-link.twitter:hover {
+        border-color: #1DA1F2;
+        color: #1DA1F2;
+    }
+
+    .social-link.whatsapp:hover {
+        border-color: #25D366;
+        color: #25D366;
+    }
+
+    .cta-button {
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .about-hero h1 {
+            font-size: 2.5rem;
+        }
+
+        .mission-section,
+        .contact-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .social-links {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-hero">
+    <h1>About Cool-E</h1>
+    <p>
+        We're revolutionizing how people connect with service professionals.
+        Our platform bridges the gap between those who need quality services
+        and the skilled professionals ready to deliver them.
+    </p>
+</div>
+
+<div class="container about-content">
+    <div class="mission-section">
+        <h3>Our Mission</h3>
+        <p>
+            Cool-E is dedicated to making quality service accessible to everyone.
+            We carefully vet every professional on our platform to ensure you receive
+            nothing but the best. From home repairs to beauty services, we're your
+            trusted partner in finding the right expert for every need.
+        </p>
+    </div>
+
+    <div class="contact-section">
+        <h3>Get in Touch</h3>
+
+        <div class="contact-methods">
+            <div class="contact-method">
+                <div class="contact-method-icon">📞</div>
+                <h4>Phone</h4>
+                <a href="tel:+11234567890">+1 (234) 567-890</a>
+            </div>
+
+            <div class="contact-method">
+                <div class="contact-method-icon">✉️</div>
+                <h4>Email</h4>
+                <a href="mailto:contact@cool-e.com">contact@cool-e.com</a>
+            </div>
+
+            <div class="contact-method">
+                <div class="contact-method-icon">💬</div>
+                <h4>Live Chat</h4>
+                <a href="#" onclick="alert('Chat feature launching soon!'); return false;">Start Chat</a>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 3rem;">Connect With Us</h3>
+        <div class="social-links">
+            <a href="https://www.instagram.com/cool.e.main/" target="_blank" rel="noopener"
+                class="social-link instagram">
+                <span>📸</span> Instagram
+            </a>
+            <a href="https://facebook.com/coole" target="_blank" rel="noopener" class="social-link facebook">
+                <span>👍</span> Facebook
+            </a>
+            <a href="https://twitter.com/coole" target="_blank" rel="noopener" class="social-link twitter">
+                <span>🐦</span> Twitter
+            </a>
+            <a href="https://wa.me/11234567890" target="_blank" rel="noopener" class="social-link whatsapp">
+                <span>💚</span> WhatsApp
+            </a>
+        </div>
+
+        <div class="cta-button">
+            <a href="mailto:contact@cool-e.com" class="btn btn-primary" style="padding: 1rem 3rem;">
+                Send Us an Email
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

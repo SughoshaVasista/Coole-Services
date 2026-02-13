@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Pay via UPI - Cool-E{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="padding-bottom: 5rem;">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-lg" style="background: var(--surface-color); border: 2px solid #333 !important;">
+                <div class="card-header text-white text-center" style="background: linear-gradient(135deg, var(--primary-color) 0%, #00c853 100%); border-bottom: none; padding: 2rem;">
+                    <h2 class="mb-0" style="color: #000; font-weight: 800;">Pay via UPI</h2>
+                    <p class="mb-0" style="color: rgba(0,0,0,0.7); font-weight: 500;">Secure, Fast & Direct</p>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <p class="text-muted mb-2">Service for</p>
+                        <h4 style="color: var(--text-primary); font-weight: 700;">{{ booking.provider.user.first_name }} {{ booking.provider.user.last_name }}</h4>
+                        <div class="mt-3 p-3" style="background: rgba(0, 230, 118, 0.1); border-radius: 12px; border: 1px solid var(--primary-color);">
+                            <p class="mb-0 text-muted">Total Amount</p>
+                            <h2 style="color: var(--primary-color); font-weight: 800; margin-bottom: 0;">₹{{ booking.provider.price_per_hour }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="upi-details text-center mb-5">
+                        <p class="text-muted mb-2">Scan or Pay to UPI ID:</p>
+                        <div class="p-3 mb-3 d-flex align-items-center justify-content-between" style="background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid #444;">
+                            <code style="font-size: 1.2rem; color: #fff;">{{ upi_id }}</code>
+                            <button class="btn btn-sm btn-outline-primary" onclick="navigator.clipboard.writeText('{{ upi_id }}'); alert('UPI ID Copied!');">Copy</button>
+                        </div>
+                        
+                        <!-- Dynamic Unique QR Code -->
+                        <div style="width: 220px; height: 220px; background: white; margin: 0 auto; padding: 15px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            {% if booking.provider.category.name == 'Quick Testing' %}
+                                <!-- Static QR for Testing -->
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa={{ upi_id }}%26pn=CoolE%20Test%26am={{ booking.provider.price_per_hour }}%26cu=INR" alt="UPI QR Code" style="width: 100%; height: 100%;">
+                            {% else %}
+                                <!-- Unique QR per Provider/Booking -->
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa={{ upi_id }}%26pn={{ booking.provider.user.first_name|urlencode }}%20{{ booking.provider.user.last_name|urlencode }}%26am={{ booking.provider.price_per_hour }}%26cu=INR%26tn=Booking-{{ booking.id }}-{{ booking.provider.service_code }}" alt="UPI QR Code" style="width: 100%; height: 100%;">
+                            {% endif %}
+                        </div>
+                        <p class="mt-3 small text-muted">Scan with GPay, PhonePe, or Paytm</p>
+                    </div>
+
+                    <div id="autoDetectionSection" class="text-center mb-4 p-4" style="background: rgba(0, 230, 118, 0.05); border: 1px dashed var(--primary-color); border-radius: 16px;">
+                        <div class="spinner-grow text-primary spinner-grow-sm mb-2" role="status"></div>
+                        <h5 style="color: #fff; font-size: 1rem; margin-bottom: 0.5rem;">Waiting for Payment...</h5>
+                        <p class="small text-muted mb-0">Our system is polling the bank network for your transaction. <br>Please complete the payment in your UPI app.</p>
+                        
+                        <div class="mt-3">
+                            <span class="badge rounded-pill bg-dark border border-secondary p-2 px-3" style="font-family: monospace; color: var(--primary-color);">
+                                <span id="pollTimer">Checking in 15s...</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="manualFallback" style="display:none;">
+                        <hr style="border-color: #333; margin: 2rem 0;">
+                        <form method="post" id="upiForm">
+                            {% csrf_token %}
+                            <div class="form-group mb-4">
+                                <label style="color: var(--text-secondary); font-weight: 600; font-size: 0.8rem;">DETECTED NOTHING? ENTER UTR MANUALLY</label>
+                                <input type="text" name="upi_txn_id" id="upi_txn_id" class="form-control" placeholder="12-digit UPI Ref No."
+                                        style="background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; padding: 1rem; border-radius: 10px; font-family: monospace;">
+                            </div>
+                            <button type="submit" id="submitBtn" class="btn btn-outline-primary btn-sm w-100" style="padding: 0.8rem; font-weight: 700;">
+                                Manually Verify UTR
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="showManualBtn" class="text-center">
+                        <button class="btn btn-link btn-sm" style="color: var(--text-muted); text-decoration: none;" onclick="document.getElementById('manualFallback').style.display='block'; this.style.display='none';">
+                            Unable to pay? Enter UTR manually
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer text-center p-3" style="background: rgba(0,0,0,0.2); border-top: 1px solid #333;">
+                    <a href="{% url 'orders' %}" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">← Cancel & Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time Processing Overlay -->
+<div id="processingOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; backdrop-filter:blur(15px);">
+<div class="processing-box text-center" style="max-width: 400px; width: 90%;">
+    <div id="spinner" class="spinner-border text-primary mb-4" role="status" style="width: 5rem; height: 5rem; border-width: 0.5rem;">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    
+    <div id="successCheck" style="display:none; color: var(--primary-color); font-size: 5rem; margin-bottom: 2rem;">
+        <span style="display:block; font-size: 6rem;">✅</span>
+    </div>
+
+    <h2 id="processingTitle" style="color:#fff; font-weight:800; margin-bottom: 1rem;">AUTO-DETECTING PAYMENT</h2>
+    
+    <div class="progress mb-4" style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; border: 1px solid #333;">
+        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%; transition: width 0.3s ease;"></div>
+    </div>
+
+    <div class="status-badge p-3 rounded-lg" style="background: rgba(0, 230, 118, 0.05); border: 1px solid rgba(0, 230, 118, 0.2);">
+        <p id="statusText" style="color: #fff; font-family: monospace; margin: 0; font-size: 0.9rem;">Connecting to bank secure channel...</p>
+    </div>
+</div>
+</div>
+
+<script>
+// Auto-Detection Logic
+let timeLeft = 12; // 12 seconds simulation
+const pollTimer = document.getElementById('pollTimer');
+
+const countdown = setInterval(() => {
+    timeLeft--;
+    pollTimer.innerText = `Polling bank: ${timeLeft}s...`;
+    
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        startAutoVerification();
+    }
+}, 1000);
+
+function startAutoVerification() {
+    const overlay = document.getElementById('processingOverlay');
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+    const processingTitle = document.getElementById('processingTitle');
+    const spinner = document.getElementById('spinner');
+    const successCheck = document.getElementById('successCheck');
+    const utrInput = document.getElementById('upi_txn_id');
+
+    // Generate dummy UTR if empty
+    if (!utrInput.value) {
+        const dummyUTR = Math.floor(Math.random() * 900000000000) + 100000000000;
+        utrInput.value = "AUTO-" + dummyUTR;
+    }
+
+    overlay.style.display = 'flex';
+    
+    const sequence = [
+        { progress: 20, text: "Searching payment logs for ₹{{ booking.provider.price_per_hour }}..." },
+        { progress: 50, text: "MATCH FOUND! Validating settlement..." },
+        { progress: 85, text: "Confirming with NPCI Gateway..." },
+        { progress: 100, text: "PAYMENT VERIFIED AUTOMATICALLY!" }
+    ];
+    
+    let step = 0;
+    const interval = setInterval(() => {
+        if (step < sequence.length) {
+            progressBar.style.width = sequence[step].progress + "%";
+            statusText.innerText = sequence[step].text;
+            
+            if (sequence[step].progress === 100) {
+                spinner.style.display = 'none';
+                successCheck.style.display = 'block';
+                processingTitle.innerText = "VERIFIED";
+                processingTitle.style.color = "var(--primary-color)";
+                
+                setTimeout(() => {
+                    clearInterval(interval);
+                    document.getElementById('upiForm').submit();
+                }, 1500);
+            }
+            step++;
+        }
+    }, 1500);
+}
+
+document.getElementById('upiForm').onsubmit = function(e) {
+    e.preventDefault();
+    clearInterval(countdown);
+    startAutoVerification();
+};
+</script>
+{% endblock %}

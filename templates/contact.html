@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - Cool-E{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-page {
+        min-height: 70vh;
+        padding: 4rem 1rem;
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+
+    .contact-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .contact-header h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary), #00cc6a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .contact-header p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+    }
+
+    .contact-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .contact-form {
+        background: var(--bg-card);
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
+        padding: 3rem 2.5rem;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.9rem 1.2rem;
+        background-color: var(--bg-secondary);
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: var(--transition-base);
+        font-family: var(--font-body);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .submit-btn {
+        width: 100%;
+        margin-top: 1rem;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .contact-info {
+        margin-top: 3rem;
+        text-align: center;
+        padding: 2rem;
+        background: var(--bg-card);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+    }
+
+    .contact-info h3 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .contact-info p {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .contact-form {
+            padding: 2rem 1.5rem;
+        }
+
+        .contact-header h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+    <div class="container contact-container">
+        <div class="contact-header">
+            <h1>Get In Touch</h1>
+            <p>Have a question or need assistance? We're here to help!</p>
+        </div>
+
+        <form class="contact-form" method="post" action="#">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="name">Full Name <span style="color: var(--accent);">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address <span style="color: var(--accent);">*</span></label>
+                <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" placeholder="What is this about?">
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message <span style="color: var(--accent);">*</span></label>
+                <textarea id="message" name="message" placeholder="Tell us how we can help you..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary submit-btn">Send Message</button>
+        </form>
+
+        <div class="contact-info">
+            <h3>Other Ways to Reach Us</h3>
+            <p><strong>Email:</strong> support@cool-e.com</p>
+            <p><strong>Phone:</strong> +1 (234) 567-890</p>
+            <p><strong>Business Hours:</strong> Mon-Fri, 9AM-6PM EST</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,856 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ provider.user.first_name }} {{ provider.user.last_name }} - Cool-E{% endblock %}
+
+{% block content %}
+
+<style>
+    .provider-detail-page {
+        padding: 2rem 1rem 4rem;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        animation: slideInLeft 0.6s ease-out;
+    }
+
+    .breadcrumb a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .breadcrumb a:hover {
+        color: var(--primary-hover);
+    }
+
+    .breadcrumb-separator {
+        color: #666;
+    }
+
+    /* Service Category Banner */
+    .service-category-banner {
+        margin-bottom: 2.5rem;
+        padding: 2rem 2.5rem;
+        background: linear-gradient(135deg,
+                rgba(0, 230, 118, 0.1) 0%,
+                rgba(0, 200, 83, 0.1) 100%);
+        border-left: 6px solid var(--primary-color);
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 230, 118, 0.15);
+        animation: slideInRight 0.6s ease-out;
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .service-category-banner h4 {
+        margin: 0 0 0.8rem 0;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .service-category-banner h4 span {
+        font-size: 1.6rem;
+    }
+
+    .service-category-banner p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    /* Main Provider Card */
+    .provider-card {
+        background: var(--surface-color);
+        padding: 3rem;
+        border-radius: 24px;
+        border: 2px solid #333;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 4rem;
+        transition: all 0.3s ease;
+        animation: scaleIn 0.6s ease-out;
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .provider-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 20px 50px rgba(0, 230, 118, 0.25);
+    }
+
+    /* Left Column - Profile */
+    .provider-profile-section {
+        text-align: center;
+    }
+
+    .profile-image-wrapper {
+        position: relative;
+        width: 260px;
+        height: 260px;
+        margin: 0 auto 2rem;
+    }
+
+    .profile-image {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        border-radius: 50%;
+        overflow: hidden;
+        border: 6px solid var(--primary-color);
+        box-shadow: 0 15px 40px rgba(0, 230, 118, 0.5);
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .profile-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 20px 50px rgba(0, 230, 118, 0.7);
+    }
+
+    .profile-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-image-placeholder {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+        font-size: 6rem;
+        color: #666;
+    }
+
+    .verified-badge-large {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: var(--primary-color);
+        color: #000;
+        border-radius: 50%;
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: bold;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        border: 5px solid var(--surface-color);
+        animation: pulse 2s infinite;
+    }
+
+    .provider-name {
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    .provider-age {
+        color: var(--text-secondary);
+        margin-bottom: 1.2rem;
+        font-size: 1rem;
+    }
+
+    .provider-age span {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+        display: inline-block;
+        border: 1px solid #333;
+    }
+
+    .service-code-display {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .service-code-display strong {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    /* Rating Display */
+    .rating-section {
+        margin-bottom: 2rem;
+    }
+
+    .stars-large {
+        font-size: 2.2rem;
+        color: #ffd700;
+        margin-bottom: 0.5rem;
+        letter-spacing: 5px;
+        text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    }
+
+    .rating-text {
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    /* Price Box */
+    .price-box {
+        background: linear-gradient(135deg,
+                rgba(0, 230, 118, 0.15) 0%,
+                rgba(0, 200, 83, 0.15) 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        border: 2px solid var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .price-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 230, 118, 0.4);
+    }
+
+    .price-label {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .price-amount {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 2.8rem;
+        margin: 0;
+        line-height: 1;
+    }
+
+    .price-unit {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+    }
+
+    /* Contact Info */
+    .contact-info-box {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 2rem;
+        border-radius: 16px;
+        text-align: left;
+        border: 1px solid #333;
+        transition: all 0.3s ease;
+    }
+
+    .contact-info-box:hover {
+        border-color: var(--primary-color);
+        background: rgba(0, 230, 118, 0.05);
+    }
+
+    .contact-info-box h4 {
+        color: var(--primary-color);
+        margin: 0 0 1.5rem 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 700;
+    }
+
+    .contact-item {
+        margin-bottom: 1.2rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: start;
+        gap: 0.8rem;
+        font-size: 0.95rem;
+    }
+
+    .contact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-item strong {
+        min-width: 75px;
+        color: var(--text-primary);
+    }
+
+    .contact-item a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .contact-item a:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+    /* Right Column - Details */
+    .provider-details-section {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+    }
+
+    /* About Section */
+    .about-section h3 {
+        margin-bottom: 1.2rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .about-section h3 span {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+    }
+
+    .about-text {
+        margin-bottom: 1.5rem;
+        color: var(--text-secondary);
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+
+    /* Specialties */
+    .specialties-section h4 {
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .specialties-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+    }
+
+    .specialty-tag {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+        padding: 0.5rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .specialty-tag:hover {
+        background: rgba(59, 130, 246, 0.25);
+        border-color: #3b82f6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Booking Form */
+    .booking-section {
+        background: linear-gradient(135deg,
+                rgba(0, 230, 118, 0.08) 0%,
+                rgba(0, 200, 83, 0.08) 100%);
+        padding: 2.5rem;
+        border-radius: 20px;
+        border: 2px solid var(--primary-color);
+        box-shadow: 0 10px 30px rgba(0, 230, 118, 0.15);
+    }
+
+    .booking-section h3 {
+        margin: 0 0 2rem 0;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .booking-section h3 span {
+        color: var(--primary-color);
+        font-size: 1.6rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1.2rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid #333;
+        border-radius: 12px;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.15);
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 1.4rem;
+        background: var(--primary-color);
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(0, 230, 118, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .submit-btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(0, 230, 118, 0.6);
+    }
+
+    .booking-note {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-top: 1.5rem;
+        text-align: center;
+        line-height: 1.7;
+        padding: 1.2rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    .booking-note strong {
+        color: var(--primary-color);
+    }
+
+    /* Reviews Section */
+    .reviews-section {
+        margin-top: 3rem;
+    }
+
+    .reviews-section h3 {
+        margin-bottom: 2rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .reviews-section h3 span {
+        color: var(--primary-color);
+        font-size: 1.6rem;
+    }
+
+    .review-card {
+        border-left: 4px solid var(--primary-color);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1.8rem;
+        margin-bottom: 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .review-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateX(8px);
+        box-shadow: 0 6px 20px rgba(0, 230, 118, 0.15);
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .review-author {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .review-stars {
+        color: #ffd700;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+    }
+
+    .review-text {
+        color: var(--text-secondary);
+        margin: 0;
+        line-height: 1.7;
+        font-size: 1rem;
+        font-style: italic;
+    }
+
+    .no-reviews {
+        text-align: center;
+        padding: 4rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        border: 2px dashed #333;
+    }
+
+    .no-reviews-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .no-reviews p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+    }
+
+    .no-reviews p:first-of-type {
+        font-size: 1.2rem;
+        color: var(--text-primary);
+    }
+
+    @media (max-width: 968px) {
+        .provider-card {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            padding: 2rem;
+        }
+
+        .profile-image-wrapper {
+            width: 220px;
+            height: 220px;
+        }
+
+        .provider-name {
+            font-size: 1.8rem;
+        }
+
+        .price-amount {
+            font-size: 2.2rem;
+        }
+
+        .breadcrumb {
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .provider-detail-page {
+            padding: 1rem 0.5rem 3rem;
+        }
+
+        .service-category-banner {
+            padding: 1.5rem;
+        }
+
+        .service-category-banner h4 {
+            font-size: 1.2rem;
+        }
+
+        .provider-card {
+            padding: 1.5rem;
+        }
+
+        .profile-image-wrapper {
+            width: 180px;
+            height: 180px;
+        }
+
+        .provider-name {
+            font-size: 1.5rem;
+        }
+
+        .booking-section {
+            padding: 2rem;
+        }
+    }
+</style>
+
+<div class="container provider-detail-page">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{% url 'services' %}">Services</a>
+        <span class="breadcrumb-separator">›</span>
+        <a href="{% url 'category_detail' provider.category.id %}">{{ provider.category.name }}</a>
+        <span class="breadcrumb-separator">›</span>
+        <span>{{ provider.user.first_name }} {{ provider.user.last_name }}</span>
+    </nav>
+
+    <!-- Service Category Banner -->
+    {% if provider.category %}
+    <div class="service-category-banner">
+        <h4>
+            <span>📋</span>
+            Booking Service: {{ provider.category.name }}
+        </h4>
+        <p>{{ provider.category.description }}</p>
+    </div>
+    {% endif %}
+
+    <div class="provider-card">
+        <!-- Left Column: Profile Info -->
+        <div class="provider-profile-section">
+            <div class="profile-image-wrapper">
+                <div class="profile-image">
+                    {% if provider.profile_pic %}
+                    <img src="{{ provider.profile_pic.url }}" alt="{{ provider.user.username }}">
+                    {% else %}
+                    <div class="profile-image-placeholder">
+                        <span>👤</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="verified-badge-large">✓</div>
+            </div>
+
+            <h2 class="provider-name">
+                {{ provider.user.first_name }} {{ provider.user.last_name }}
+            </h2>
+
+            <p class="provider-age">
+                <span>{{ provider.age }} years old</span>
+            </p>
+
+            <p class="service-code-display">
+                Service Code: <strong>{{ provider.service_code }}</strong>
+            </p>
+
+            <!-- Rating -->
+            <div class="rating-section">
+                <div class="stars-large">
+                    {% for i in "12345" %}
+                    {% if provider.rating >= forloop.counter %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                </div>
+                <p class="rating-text">{{ provider.rating }}/5.0 Rating</p>
+            </div>
+
+            <!-- Price -->
+            <div class="price-box">
+                <p class="price-label">Hourly Rate</p>
+                <p class="price-amount">
+                    ₹{{ provider.price_per_hour }}
+                    <span class="price-unit">/hour</span>
+                </p>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact-info-box">
+                <h4>📞 Contact Information</h4>
+                <div class="contact-item">
+                    <strong>Phone:</strong>
+                    <span><a href="tel:{{ provider.contact_number }}">{{ provider.contact_number }}</a></span>
+                </div>
+                <div class="contact-item">
+                    <strong>Address:</strong>
+                    <span>{{ provider.address }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Details & Booking -->
+        <div class="provider-details-section">
+            <!-- About Section -->
+            <div class="about-section">
+                <h3>
+                    <span>ℹ️</span> About Me
+                </h3>
+                <p class="about-text">{{ provider.description }}</p>
+
+                <!-- Specialties -->
+                <div class="specialties-section">
+                    <h4>Specialties:</h4>
+                    <div class="specialties-tags">
+                        {% if "Women" in provider.category.name %}
+                        <span class="specialty-tag">💇 Hair Styling</span>
+                        <span class="specialty-tag">💄 Makeup</span>
+                        <span class="specialty-tag">✨ Facial</span>
+                        <span class="specialty-tag">💅 Manicure</span>
+                        {% elif "Men" in provider.category.name %}
+                        <span class="specialty-tag">✂️ Classic Cuts</span>
+                        <span class="specialty-tag">🧔 Beard Grooming</span>
+                        <span class="specialty-tag">🪒 Hot Towel Shave</span>
+                        <span class="specialty-tag">🎨 Hair Coloring</span>
+                        {% elif "Cleaning" in provider.category.name %}
+                        <span class="specialty-tag">🧹 Deep Cleaning</span>
+                        <span class="specialty-tag">🌿 Eco-Friendly</span>
+                        <span class="specialty-tag">📦 Move-in/out</span>
+                        <span class="specialty-tag">🦠 Sanitization</span>
+                        {% elif "Electrician" in provider.category.name %}
+                        <span class="specialty-tag">⚡ Wiring</span>
+                        <span class="specialty-tag">🔌 Circuit Repair</span>
+                        <span class="specialty-tag">🛡️ Safety Inspection</span>
+                        <span class="specialty-tag">📊 Panel Upgrade</span>
+                        {% elif "Painting" in provider.category.name %}
+                        <span class="specialty-tag">🏠 Interior</span>
+                        <span class="specialty-tag">🏡 Exterior</span>
+                        <span class="specialty-tag">🎨 Texture Work</span>
+                        <span class="specialty-tag">🎭 Color Consultation</span>
+                        {% elif "AC" in provider.category.name %}
+                        <span class="specialty-tag">🔧 Repair</span>
+                        <span class="specialty-tag">❄️ Installation</span>
+                        <span class="specialty-tag">🔄 Maintenance</span>
+                        <span class="specialty-tag">💨 Gas Refill</span>
+                        {% else %}
+                        <span class="specialty-tag">✅ Professional Service</span>
+                        <span class="specialty-tag">⭐ Quality Work</span>
+                        <span class="specialty-tag">⏰ Timely Delivery</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="booking-section">
+                {% if provider.status == 'available' %}
+                <h3>
+                    <span>📅</span> Book an Appointment
+                </h3>
+                <form action="{% url 'book_provider' provider.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="date" class="form-label">Select Date & Time</label>
+                        <input type="datetime-local" id="date" name="date" required class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service_location" class="form-label">Service Location / Address</label>
+                        <input type="text" id="service_location" name="service_location" placeholder="e.g. 123 Main St, Bangalore" required class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                        <textarea id="notes" name="notes" placeholder="Describe your issue or specific requirements..." rows="3" class="form-input" style="resize: vertical;"></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        ✓ Confirm Booking
+                    </button>
+
+                    <div class="booking-note">
+                        💰 Base Price: <strong>₹{{ provider.price_per_hour }}/hour</strong><br>
+                        📝 Tips and reviews can be added after service completion.<br>
+                    </div>
+                </form>
+                {% else %}
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🚫</div>
+                    <h3 style="color: #dc3545; justify-content: center;">Provider Unavailable</h3>
+                    <p style="color: var(--text-secondary);">
+                        Current Status: <strong style="text-transform: uppercase;">{{ provider.get_status_display }}</strong>
+                        <br>This partner is currently busy or offline.
+                    </p>
+                    <a href="{% url 'category_detail' provider.category.id %}" class="btn btn-secondary" style="margin-top: 1rem;">Find Other Providers</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section">
+                <h3>
+                    <span>⭐</span> Customer Reviews
+                </h3>
+                {% for booking in provider.bookings.all %}
+                {% if booking.review_text %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <p class="review-author">{{ booking.user.first_name }}</p>
+                        <span class="review-stars">
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= booking.review_stars %}★{% else %}☆{% endif %} {% endfor %} </span>
+                    </div>
+                    <p class="review-text">"{{ booking.review_text }}"</p>
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="no-reviews">
+                    <div class="no-reviews-icon">📝</div>
+                    <p>No reviews yet.</p>
+                    <p>Be the first to book and review!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

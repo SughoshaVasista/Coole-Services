@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Cool-E - Connect with Pros{% endblock %}
+
+{% block content %}
+<section class="hero-section" style="position: relative; overflow: hidden; padding: 6rem 1rem;">
+    <div class="container" style="position: relative; z-index: 10;">
+        <h1>Welcome to Cool-E</h1>
+        <p>Find the best professionals for your needs, or list your services today.</p>
+
+        <!-- Search Bar -->
+        <div style="max-width: 600px; margin: 2rem auto;">
+            <form action="{% url 'services' %}" method="get"
+                style="display: flex; gap: 0.5rem; background: rgba(18, 18, 18, 0.8); padding: 0.5rem; border-radius: 8px; border: 1px solid #333;">
+                <input type="text" name="q" placeholder="Search for jobs or services..."
+                    style="flex: 1; padding: 0.8rem; border: none; font-size: 1rem; border-radius: 4px; background: transparent; color: white;">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <div class="cta-buttons">
+            <a href="{% url 'services' %}" class="btn btn-primary">Browse Services</a>
+        </div>
+    </div>
+</section>
+
+<section class="features-section" style="padding: 4rem 1rem;">
+    <div class="container">
+        <h2 class="text-center mb-4" style="color: var(--primary);">Popular Categories</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+            <a href="{% url 'services' %}?category=Electrician" class="card text-center"
+                style="display: block; transition: all 0.3s ease; text-decoration: none;">
+                <h3 class="text-primary mb-1">⚡ Electrician</h3>
+                <p class="text-secondary">Wiring & Fixes</p>
+            </a>
+            <a href="{% url 'services' %}?category=Cleaning" class="card text-center"
+                style="display: block; transition: all 0.3s ease; text-decoration: none;">
+                <h3 class="text-primary mb-1">🧹 Cleaning</h3>
+                <p class="text-secondary">Deep House Cleaning</p>
+            </a>
+            <a href="{% url 'services' %}?category=InstaHelp" class="card text-center"
+                style="display: block; transition: all 0.3s ease; text-decoration: none;">
+                <h3 class="text-primary mb-1">🆘 InstaHelp</h3>
+                <p class="text-secondary">Emergency Repairs</p>
+            </a>
+            <a href="{% url 'services' %}?category=Salon" class="card text-center"
+                style="display: block; transition: all 0.3s ease; text-decoration: none;">
+                <h3 class="text-primary mb-1">💇 Beauty & Salon</h3>
+                <p class="text-secondary">Styling & Grooming</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="about-section" style="padding: 6rem 1rem; background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--border-color);">
+    <div class="container" style="text-align: center;">
+        <h2 style="margin-bottom: 1.5rem; color: white;">Why Cool-E?</h2>
+        <p style="max-width: 700px; margin: 0 auto 2rem; color: var(--text-secondary); font-size: 1.1rem;">
+            Whether you need help with daily tasks or professional services, we connect you with verified experts.
+            Secure payments, trusted reviews, and guaranteed satisfaction with our real-time service tracking.
+        </p>
+        <a href="{% url 'about' %}" class="btn btn-outline" style="padding: 1rem 3rem;">Learn More About Us</a>
+    </div>
+</section>
+{% endblock %}

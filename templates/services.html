@@ -1,0 +1,549 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Our Services - Cool-E{% endblock %}
+
+{% block content %}
+
+<div class="services-hero">
+    <div class="hero-glow"></div>
+    <h1>Premium Service Categories</h1>
+    <p>Browse our curated selection of professional service providers</p>
+    <div class="hero-decoration">
+        <span class="deco-line"></span>
+        <span class="deco-dot"></span>
+        <span class="deco-line"></span>
+    </div>
+    <div class="stats-row">
+        <div class="stat-box">
+            <strong>{{ categories.count }}+</strong>
+            <span>Categories</span>
+        </div>
+        <div class="stat-box">
+            <strong>100+</strong>
+            <span>Professionals</span>
+        </div>
+        <div class="stat-box">
+            <strong>1000+</strong>
+            <span>Happy Clients</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Services Hero Section */
+    .services-hero {
+        text-align: center;
+        padding: 4rem 1rem 3rem;
+        margin-bottom: 3rem;
+        position: relative;
+        animation: fadeInDown 0.6s ease-out;
+    }
+
+    .hero-glow {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(0, 230, 118, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    .services-hero h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #00c853 50%, var(--primary-color) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        background-size: 200% 200%;
+        animation: gradientShift 3s ease infinite;
+        position: relative;
+        z-index: 1;
+    }
+
+    @keyframes gradientShift {
+
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    .services-hero p {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-decoration {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .deco-line {
+        width: 80px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    }
+
+    .deco-dot {
+        width: 10px;
+        height: 10px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        box-shadow: 0 0 20px var(--primary-color);
+        animation: pulse 2s infinite;
+    }
+
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        animation: scaleIn 0.6s ease-out backwards;
+    }
+
+    .stat-box:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .stat-box:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .stat-box:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .stat-box strong {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        font-weight: 800;
+    }
+
+    .stat-box span {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Service Cards Container */
+    .cards-container {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 2rem;
+        flex-wrap: wrap;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .card {
+        position: relative;
+        width: 320px;
+        height: 420px;
+        border-radius: 24px;
+        overflow: hidden;
+        isolation: isolate;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    .card:nth-child(6) {
+        animation-delay: 0.6s;
+    }
+
+    .card:nth-child(7) {
+        animation-delay: 0.7s;
+    }
+
+    .card:nth-child(8) {
+        animation-delay: 0.8s;
+    }
+
+    .card:hover {
+        transform: translateY(-15px) scale(1.02);
+    }
+
+    .card img.background {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.4s ease;
+    }
+
+    .card:hover img.background {
+        transform: scale(1.15);
+    }
+
+    .backdrop {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top,
+                rgba(0, 0, 0, 0.95) 0%,
+                rgba(0, 0, 0, 0.7) 50%,
+                rgba(0, 0, 0, 0.3) 100%);
+        transition: background 0.3s ease;
+    }
+
+    .card:hover .backdrop {
+        background: linear-gradient(to top,
+                rgba(0, 0, 0, 0.98) 0%,
+                rgba(0, 0, 0, 0.8) 50%,
+                rgba(0, 0, 0, 0.4) 100%);
+    }
+
+    .card-content {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 2rem 1.8rem;
+        color: white;
+        z-index: 2;
+        transform: translateY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-content {
+        transform: translateY(-8px);
+    }
+
+    .card-content h2 {
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+        color: var(--primary-color);
+        font-weight: 800;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-content p {
+        font-size: 0.95rem;
+        margin-bottom: 1.2rem;
+        color: #e0e0e0;
+        line-height: 1.6;
+    }
+
+    .provider-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(0, 230, 118, 0.25);
+        color: var(--primary-color);
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        margin-bottom: 1.2rem;
+        border: 2px solid var(--primary-color);
+        font-weight: 700;
+        backdrop-filter: blur(5px);
+    }
+
+    .provider-count::before {
+        content: '✓';
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .view-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.8rem 1.8rem;
+        background: var(--primary-color);
+        color: #000;
+        text-decoration: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(0, 230, 118, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .view-btn:hover {
+        background: var(--primary-hover);
+        transform: translateX(5px);
+        box-shadow: 0 8px 25px rgba(0, 230, 118, 0.6);
+    }
+
+    .view-btn::after {
+        content: '→';
+        transition: transform 0.3s ease;
+        font-size: 1.2rem;
+    }
+
+    .view-btn:hover::after {
+        transform: translateX(5px);
+    }
+
+    /* Animated Glow Border */
+    .card::before {
+        content: "";
+        position: absolute;
+        inset: -3px;
+        border-radius: inherit;
+        padding: 3px;
+        background: linear-gradient(120deg,
+                #00e676,
+                #00c853,
+                #b9f6ca,
+                #00e676,
+                #00c853);
+        background-size: 400% 400%;
+        animation: glowMove 8s linear infinite;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .card:hover::before {
+        opacity: 1;
+    }
+
+    /* Info Badge */
+    .info-badge {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.8rem;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        z-index: 3;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @keyframes glowMove {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.6;
+            transform: scale(1.3);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .services-hero h1 {
+            font-size: 2.5rem;
+        }
+
+        .services-hero p {
+            font-size: 1rem;
+        }
+
+        .stats-row {
+            gap: 1.5rem;
+        }
+
+        .stat-box strong {
+            font-size: 2rem;
+        }
+
+        .cards-container {
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .card {
+            width: 90%;
+            max-width: 400px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .services-hero {
+            padding: 3rem 1rem 2rem;
+        }
+
+        .services-hero h1 {
+            font-size: 2rem;
+        }
+
+        .stats-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card {
+            width: 100%;
+            height: 400px;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-content h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="cards-container">
+
+    {% for category in categories %}
+    <div class="card">
+        <span class="info-badge">Featured</span>
+
+        {% if category.image %}
+        <img class="background" src="{{ category.image.url }}" alt="{{ category.name }}">
+        {% else %}
+
+        {% if "InstaHelp" in category.name %}
+        <img class="background" src="{% static 'images/instahelp.png' %}" alt="InstaHelp">
+        {% elif "Women" in category.name %}
+        <img class="background" src="{% static 'images/Women.jpg' %}" alt="Women's Salon">
+        {% elif "Men" in category.name %}
+        <img class="background" src="{% static 'images/Mens.jpg' %}" alt="Men's Salon">
+        {% elif "Cleaning" in category.name %}
+        <img class="background" src="{% static 'images/cleaning.jpg' %}" alt="Cleaning">
+        {% elif "Electrician" in category.name %}
+        <img class="background" src="{% static 'images/electrician.jpg' %}" alt="Electrician">
+        {% elif "Water" in category.name %}
+        <img class="background" src="{% static 'images/water.jpg' %}" alt="Water Service">
+        {% elif "Painting" in category.name %}
+        <img class="background" src="{% static 'images/painting.jpg' %}" alt="Painting">
+        {% elif "AC" in category.name %}
+        <img class="background" src="{% static 'images/ac.jpg' %}" alt="AC Repair">
+        {% elif "Plumber" in category.name %}
+        <img class="background" src="{% static 'images/plumber.jpg' %}" alt="Plumber">
+        {% else %}
+        <img class="background" src="{% static 'images/default.jpg' %}" alt="Default Service">
+        {% endif %}
+
+        {% endif %}
+
+        <div class="backdrop"></div>
+
+        <div class="card-content">
+            <h2>{{ category.name }}</h2>
+            <span class="provider-count">{{ category.providers.count }} Verified Providers</span>
+            <p>Professional, rated, and ready to serve you with excellence</p>
+            <a href="{% url 'category_detail' category.id %}" class="view-btn">
+                View Providers
+            </a>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

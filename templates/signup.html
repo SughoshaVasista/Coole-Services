@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Cool-E{% endblock %}
+
+{% block content %}
+<div class="container"
+    style="padding: 4rem 1rem; display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div class="card" style="width: 100%; max-width: 450px;">
+        <h2 class="text-center mb-4 text-primary">Create Your Account</h2>
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 1rem;">Create My Account</button>
+        </form>
+
+        <style>
+            .auth-form p {
+                margin-bottom: 1.5rem;
+            }
+            .auth-form input {
+                /* Use the global .form-control styles by default if possible, 
+                   but since form.as_p is used, we'll force style matching */
+                width: 100%;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 0.8rem 1rem;
+                color: white;
+                transition: var(--transition-base);
+            }
+            .auth-form input:focus {
+                outline: none;
+                border-color: var(--primary);
+                background: rgba(255, 255, 255, 0.05);
+                box-shadow: 0 0 15px var(--primary-glow);
+            }
+            .auth-form label {
+                display: block;
+                color: var(--text-secondary);
+                margin-bottom: 0.5rem;
+                font-size: 0.9rem;
+            }
+            .auth-form .helptext {
+                display: block;
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-top: 0.25rem;
+            }
+            .errorlist {
+                color: var(--accent);
+                list-style: none;
+                padding: 0;
+                font-size: 0.85rem;
+                margin-bottom: 1rem;
+            }
+        </style>
+
+        <p class="text-center mt-3 text-secondary" style="font-size: 0.9rem;">
+            Already have an account? <a href="{% url 'login' %}" class="text-primary" style="font-weight: 500;">Access
+                Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Cool-E{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-page {
+        padding: 4rem 1rem;
+        background: radial-gradient(circle at top right, rgba(0, 255, 136, 0.05), transparent 400px);
+        min-height: 80vh;
+    }
+
+    .glass-card {
+        background: rgba(21, 21, 21, 0.8);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin-bottom: 3rem;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .profile-avatar-container {
+        width: 150px;
+        height: 150px;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .profile-avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 3px solid var(--primary);
+        object-fit: cover;
+        box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--bg-secondary);
+        border: 2px dashed var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .avatar-edit-label {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: var(--primary);
+        color: var(--secondary);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition-base);
+        box-shadow: var(--shadow-md);
+    }
+
+    .avatar-edit-label:hover {
+        transform: scale(1.1);
+        background: white;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .form-section-title {
+        font-family: var(--font-accent);
+        color: var(--primary);
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .input-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-label {
+        display: block;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .styled-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        color: white;
+        transition: var(--transition-base);
+        font-family: inherit;
+    }
+
+    .styled-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .booking-list {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .booking-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: var(--transition-base);
+    }
+
+    .booking-card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--primary);
+        transform: translateX(5px);
+    }
+
+    .status-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .status-confirmed { background: rgba(0, 255, 136, 0.1); color: var(--primary); border: 1px solid var(--primary); }
+    .status-pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid #fbbf24; }
+    .status-cancelled { background: rgba(255, 51, 102, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+    .status-completed { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6; }
+
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .booking-card {
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container">
+        <!-- User Profile Card -->
+        <div class="glass-card">
+            <div class="profile-header">
+                <div class="profile-avatar-container">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="{{ user.username }}" class="profile-avatar">
+                    {% else %}
+                        <div class="avatar-placeholder">👤 No Image</div>
+                    {% endif %}
+                    <form method="post" enctype="multipart/form-data" id="avatar-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_profile">
+                        <label for="profile_picture" class="avatar-edit-label" title="Change Photo">
+                            📷
+                        </label>
+                        <input type="file" id="profile_picture" name="profile_picture" style="display: none;" onchange="document.getElementById('avatar-form').submit()">
+                    </form>
+                </div>
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ user.username }}</h1>
+                    <p class="text-secondary">Logged in as <span class="text-primary">{{ user.email }}</span></p>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
+                
+                <div class="form-grid">
+                    <div>
+                        <h3 class="form-section-title">Personal Information</h3>
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="input-group" style="flex: 1;">
+                                <label class="input-label">First Name</label>
+                                <input type="text" name="first_name" value="{{ user.first_name }}" class="styled-input">
+                            </div>
+                            <div class="input-group" style="flex: 1;">
+                                <label class="input-label">Last Name</label>
+                                <input type="text" name="last_name" value="{{ user.last_name }}" class="styled-input">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Email Address</label>
+                            <input type="email" name="email" value="{{ user.email }}" class="styled-input">
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="form-section-title">Contact & Location</h3>
+                        <div class="input-group">
+                            <label class="input-label">Phone Number</label>
+                            <input type="text" name="phone_number" value="{{ profile.phone_number }}" class="styled-input">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Current Location</label>
+                            <input type="text" name="current_location" value="{{ profile.current_location }}" class="styled-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-top: 1rem;">
+                    <label class="input-label">Delivery/Service Address</label>
+                    <textarea name="address" rows="3" class="styled-input">{{ profile.address }}</textarea>
+                </div>
+
+                <div style="text-align: right; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 1rem 3rem;">Update Profile Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bookings Section -->
+        <h2 style="font-family: var(--font-accent); font-size: 1.5rem; margin-bottom: 2rem; color: var(--primary);">
+            <span style="font-size: 1.2rem; margin-right: 0.5rem;">📦</span> My Service History
+        </h2>
+
+        {% if user_bookings %}
+            <div class="booking-list">
+                {% for booking in user_bookings %}
+                <div class="booking-card">
+                    <div style="display: flex; gap: 1.5rem; align-items: center;">
+                        <div style="width: 50px; height: 50px; background: rgba(0, 255, 136, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            🛠️
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.1rem; margin-bottom: 0.2rem;">{{ booking.provider.category.name }}</h4>
+                            <p class="text-secondary" style="font-size: 0.9rem;">
+                                Provider: <span class="text-primary">{{ booking.provider.user.first_name }}</span> 
+                                • {{ booking.booking_date|date:"F d, Y @ H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <span class="status-badge status-{{ booking.status }}">
+                            {{ booking.get_status_display }}
+                        </span>
+                        <a href="{% url 'orders' %}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="glass-card" style="text-align: center; padding: 4rem;">
+                <p class="text-secondary" style="font-size: 1.1rem;">You haven't booked any services yet.</p>
+                <a href="{% url 'services' %}" class="btn btn-outline" style="margin-top: 1.5rem;">Browse Available Pros</a>
+            </div>
+        {% endif %}
+
+        {% if is_provider %}
+            <div style="margin-top: 5rem;">
+                <h2 style="font-family: var(--font-accent); font-size: 1.5rem; margin-bottom: 2rem; color: var(--primary);">
+                    <span style="font-size: 1.2rem; margin-right: 0.5rem;">💼</span> Provider Quick Actions
+                </h2>
+                <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+                    <div>
+                        <p style="margin-bottom: 0.5rem;"><strong class="text-primary">Service Code:</strong> {{ provider_details.service_code }}</p>
+                        <p class="text-secondary">Manage your jobs and availability on your dedicated dashboard.</p>
+                    </div>
+                    <a href="{% url 'partner_dashboard' %}" class="btn btn-primary">Go to Partner Dashboard</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="glass-card" style="margin-top: 5rem; text-align: center; border-style: dashed; border-color: var(--primary);">
+                <h3 style="margin-bottom: 1rem;">Ready to Earn?</h3>
+                <p class="text-secondary" style="margin-bottom: 2rem;">Join our network of elite professionals and reach thousands of customers.</p>
+                <button class="btn btn-primary" onclick="alert('Provider applications are currently being accepted via email. Please send your portfolio to partners@cool-e.com')">Become a Partner</button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
