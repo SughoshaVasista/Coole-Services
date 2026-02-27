@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice #{{ invoice_id }} - Cool-E{% endblock %}
+
+{% block content %}
+<style>
+    .receipt-container {
+        max-width: 700px;
+        margin: 4rem auto;
+        padding: 4rem;
+        background: #fff;
+        color: #333;
+        border-radius: 8px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        position: relative;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .receipt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .brand-logo {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .invoice-details {
+        text-align: right;
+    }
+
+    .invoice-id {
+        font-weight: 700;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .receipt-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #999;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.85rem;
+        color: #888;
+        margin-bottom: 0.3rem;
+    }
+
+    .info-item span {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .price-breakdown {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .price-breakdown tr {
+        border-bottom: 1px solid #f9f9f9;
+    }
+
+    .price-breakdown td {
+        padding: 1rem 0;
+    }
+
+    .price-breakdown .label {
+        color: #666;
+    }
+
+    .price-breakdown .amount {
+        text-align: right;
+        font-weight: 600;
+    }
+
+    .total-row {
+        background: #f8f9fa;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #000;
+    }
+
+    .total-row td {
+        padding: 1.5rem 1rem !important;
+    }
+
+    .quote-box {
+        margin-top: 4rem;
+        padding: 2rem;
+        background: #f0fff4;
+        border-left: 4px solid #00ff88;
+        font-style: italic;
+        color: #2e7d32;
+        text-align: center;
+        border-radius: 4px;
+    }
+
+    .print-btn {
+        position: absolute;
+        top: -50px;
+        right: 0;
+        background: var(--primary-color);
+        color: #000;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .print-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4);
+    }
+
+    @media print {
+        .site-header, .site-footer, .print-btn, .breadcrumb {
+            display: none !important;
+        }
+        body { background: white; }
+        .receipt-container {
+            box-shadow: none;
+            margin: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="receipt-container">
+    <button class="print-btn" onclick="window.print()">Print Receipt</button>
+    
+    <div class="receipt-header">
+        <div class="brand-info">
+            <div class="brand-logo">Cool-E</div>
+            <p style="font-size: 0.8rem; color: #888;">Professional Services Marketplace</p>
+        </div>
+        <div class="invoice-details">
+            <div class="invoice-id">Invoice #: {{ invoice_id }}</div>
+            <div style="font-size: 0.85rem; color: #666;">Date: {{ booking.booking_date|date:"d M Y" }}</div>
+        </div>
+    </div>
+
+    <div class="receipt-section">
+        <div class="section-title">Service Details</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Service Type</label>
+                <span>{{ booking.provider.category.name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Provider</label>
+                <span>{{ booking.provider.user.first_name }} {{ booking.provider.user.last_name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Scheduled Date</label>
+                <span>{{ booking.booking_date|date:"l, d F Y" }}</span>
+            </div>
+            <div class="info-item">
+                <label>Scheduled Time</label>
+                <span>{{ booking.booking_date|date:"h:i A" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="receipt-section">
+        <div class="section-title">Customer Info</div>
+        <div class="info-item">
+            <label>Name</label>
+            <span>{{ booking.user.first_name }} {{ booking.user.last_name }}</span>
+        </div>
+        <div class="info-item" style="margin-top: 1rem;">
+            <label>Service Location</label>
+            <span>{{ booking.service_location }}</span>
+        </div>
+    </div>
+
+    <div class="receipt-section">
+        <div class="section-title">Payment Breakdown</div>
+        <table class="price-breakdown">
+            <tr>
+                <td class="label">Base Service Fee (Hourly)</td>
+                <td class="amount">₹{{ base_price }}</td>
+            </tr>
+            <tr>
+                <td class="label">Service Convenience Fee</td>
+                <td class="amount">₹{{ service_charge }}</td>
+            </tr>
+            <tr>
+                <td class="label">GST / Tax (18%)</td>
+                <td class="amount">₹{{ tax_amount }}</td>
+            </tr>
+            <tr class="total-row">
+                <td>Grand Total</td>
+                <td class="amount">₹{{ grand_total }}</td>
+            </tr>
+            {% if booking.transaction.transaction_id %}
+            <tr>
+                <td class="label" style="font-size: 0.8rem; padding-top: 1.5rem;">Transaction ID / UTR</td>
+                <td class="amount" style="font-size: 0.85rem; font-family: monospace; padding-top: 1.5rem; color: #000;">{{ booking.transaction.transaction_id }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="quote-box">
+        "{{ random_quote }}"
+    </div>
+
+    <div style="text-align: center; margin-top: 3rem; color: #999; font-size: 0.75rem;">
+        This is a computer-generated receipt. Digital verification ID: {{ invoice_id }}
+    </div>
+</div>
+{% endblock %}

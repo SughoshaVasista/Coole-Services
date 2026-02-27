@@ -479,8 +479,8 @@
     }
 
     .view-profile-btn {
-        background: transparent;
-        color: var(--primary-color);
+        background: var(--primary-color);
+        color: #000;
         border: 2px solid var(--primary-color);
         padding: 0.7rem 2rem;
         border-radius: 30px;
@@ -491,11 +491,14 @@
         font-size: 0.9rem;
         text-align: center;
         width: 100%;
+        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
     }
 
     .view-profile-btn:hover {
-        background: rgba(0, 230, 118, 0.1);
+        background: #00cc6a;
+        color: #000;
         transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
     }
 
     .empty-state {
@@ -612,6 +615,98 @@
         }
     }
 
+    /* New Sticky Recommendation Layout */
+    .category-layout {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    .sticky-recommendation {
+        position: sticky;
+        top: 100px;
+        background: linear-gradient(145deg, #1e1e1e, #151515);
+        border: 2px solid var(--primary-color);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 255, 136, 0.15);
+        animation: fadeInRight 0.8s ease-out;
+        z-index: 10;
+        /* Box always visible Fix */
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .sticky-recommendation::before {
+        content: '🏆 TOP RECOMMENDED';
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary-color);
+        color: #000;
+        font-weight: 800;
+        padding: 0.4rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .rec-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid var(--primary-color);
+        object-fit: cover;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .rec-info {
+        text-align: center;
+    }
+
+    .rec-name {
+        font-size: 1.6rem;
+        color: white;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .rec-rating {
+        color: #ffd700;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .rec-stat {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    @keyframes fadeInRight {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @media (max-width: 968px) {
+        .category-layout {
+            grid-template-columns: 1fr;
+        }
+        .sticky-recommendation {
+            position: relative;
+            top: 0;
+            margin-bottom: 2rem;
+        }
+    }
+
     @media (max-width: 640px) {
         .hero-content h1 {
             font-size: 2.2rem;
@@ -646,27 +741,29 @@
     {% if category.image %}
     <img class="hero-bg" src="{{ category.image.url }}" alt="{{ category.name }}">
     {% else %}
-    {% if "InstaHelp" in category.name %}
+    {% with cat_name=category.name|lower %}
+    {% if "instahelp" in cat_name %}
     <img class="hero-bg" src="{% static 'images/instahelp.png' %}" alt="InstaHelp">
-    {% elif "Women" in category.name %}
+    {% elif "women" in cat_name or "female" in cat_name %}
     <img class="hero-bg" src="{% static 'images/Women.jpg' %}" alt="Women's Salon">
-    {% elif "Men" in category.name %}
+    {% elif "men" in cat_name or "male" in cat_name %}
     <img class="hero-bg" src="{% static 'images/Mens.jpg' %}" alt="Men's Salon">
-    {% elif "Cleaning" in category.name %}
+    {% elif "cleaning" in cat_name %}
     <img class="hero-bg" src="{% static 'images/cleaning.jpg' %}" alt="Cleaning">
-    {% elif "Electrician" in category.name %}
+    {% elif "electric" in cat_name %}
     <img class="hero-bg" src="{% static 'images/electrician.jpg' %}" alt="Electrician">
-    {% elif "Water" in category.name %}
+    {% elif "water" in cat_name %}
     <img class="hero-bg" src="{% static 'images/water.jpg' %}" alt="Water Service">
-    {% elif "Painting" in category.name %}
+    {% elif "paint" in cat_name %}
     <img class="hero-bg" src="{% static 'images/painting.jpg' %}" alt="Painting">
-    {% elif "AC" in category.name %}
+    {% elif "ac" in cat_name or "repair" in cat_name %}
     <img class="hero-bg" src="{% static 'images/ac.jpg' %}" alt="AC Repair">
-    {% elif "Plumber" in category.name %}
+    {% elif "plumber" in cat_name %}
     <img class="hero-bg" src="{% static 'images/plumber.jpg' %}" alt="Plumber">
     {% else %}
     <img class="hero-bg" src="{% static 'images/default.jpg' %}" alt="Default Service">
     {% endif %}
+    {% endwith %}
     {% endif %}
 
     <div class="hero-overlay"></div>
@@ -712,108 +809,142 @@
         <p class="section-subtitle">Book trusted professionals ready to serve you</p>
     </div>
 
-    <div class="providers-grid">
-        {% for provider in providers %}
-        <div class="provider-card">
-            <div class="provider-info-section">
-                <div class="provider-header">
-                    <div class="provider-details">
-                        <h2 class="provider-name">{{ provider.user.first_name }} {{ provider.user.last_name }}</h2>
+    <div class="category-layout">
+        <div class="providers-grid">
+            {% for provider in providers %}
+            <div class="provider-card">
+                <div class="provider-info-section">
+                    <div class="provider-header">
+                        <div class="provider-details">
+                            <h2 class="provider-name">
+                                {{ provider.user.first_name }} {{ provider.user.last_name }}
+                                {% if provider.calculated_rating >= 4.0 %}
+                                <span style="font-size: 0.7rem; background: var(--primary-color); color: #000; padding: 0.2rem 0.6rem; border-radius: 10px; margin-left: 0.8rem; vertical-align: middle; letter-spacing: 1px; font-weight: 800; display: inline-block;">RECOMMENDED</span>
+                                {% endif %}
+                            </h2>
 
-                        <div class="provider-meta-row">
-                            <span class="meta-badge">
-                                <span>📋</span>
-                                <span>{{ provider.service_code }}</span>
-                            </span>
-                            <span class="meta-badge">
-                                <span>🎂</span>
-                                <span>{{ provider.age }} years</span>
-                            </span>
-                            <div class="rating-badge">
-                                <span class="stars">★★★★★</span>
-                                <span class="rating-value">{{ provider.rating }}/5.0</span>
+                            <div class="provider-meta-row">
+                                <span class="meta-badge">
+                                    <span>📋</span>
+                                    <span>{{ provider.service_code }}</span>
+                                </span>
+                                <span class="meta-badge">
+                                    <span>🎂</span>
+                                    <span>{{ provider.age }} years</span>
+                                </span>
+                                <div class="rating-badge">
+                                    <span class="stars">★</span>
+                                    <span class="rating-value">{{ provider.calculated_rating|floatformat:1 }} ({{ provider.review_count }} Reviews)</span>
+                                </div>
+                                <span class="meta-badge">
+                                    <span>📍</span>
+                                    <span>{{ provider.bookings.count }} bookings</span>
+                                </span>
                             </div>
-                            <span class="meta-badge">
-                                <span>📍</span>
-                                <span>{{ provider.bookings.count }} bookings</span>
-                            </span>
+                        </div>
+                    </div>
+
+                    <div class="price-tag">₹{{ provider.price_per_hour }}/hr</div>
+
+                    <p class="provider-description">
+                        {{ provider.description|truncatewords:30 }}
+                    </p>
+
+                    <div class="provider-badges">
+                        {% if "Women" in provider.category.name %}
+                        <span class="badge">💇 Hair Styling</span>
+                        <span class="badge">💄 Makeup</span>
+                        <span class="badge">✨ Facial</span>
+                        {% elif "Men" in provider.category.name %}
+                        <span class="badge">✂️ Classic Cuts</span>
+                        <span class="badge">🧔 Beard Grooming</span>
+                        <span class="badge">🪒 Hot Towel</span>
+                        {% elif "Cleaning" in provider.category.name %}
+                        <span class="badge">🧹 Deep Cleaning</span>
+                        <span class="badge">🌿 Eco-Friendly</span>
+                        <span class="badge">📦 Move-in/out</span>
+                        {% elif "Electrician" in provider.category.name %}
+                        <span class="badge">⚡ Wiring</span>
+                        <span class="badge">🔌 Circuit Repair</span>
+                        <span class="badge">🛡️ Safety</span>
+                        {% elif "Painting" in provider.category.name %}
+                        <span class="badge">🏠 Interior</span>
+                        <span class="badge">🏡 Exterior</span>
+                        <span class="badge">🎨 Texture Work</span>
+                        {% elif "AC" in provider.category.name %}
+                        <span class="badge">🔧 Repair</span>
+                        <span class="badge">❄️ Installation</span>
+                        <span class="badge">🔄 Maintenance</span>
+                        {% else %}
+                        <span class="badge">✅ Professional</span>
+                        <span class="badge">⭐ Quality Work</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="provider-contact">
+                        <div class="contact-item">
+                            <span class="contact-icon">📱</span>
+                            <span class="contact-value">{{ provider.contact_number }}</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">📍</span>
+                            <span class="contact-value">{{ provider.address|truncatewords:5 }}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="price-tag">₹{{ provider.price_per_hour }}/hr</div>
-
-                <p class="provider-description">
-                    {{ provider.description|truncatewords:30 }}
+                <div class="provider-image-section">
+                    <div class="provider-avatar-wrapper">
+                        {% if provider.profile_pic %}
+                        <img src="{{ provider.profile_pic.url }}" alt="{{ provider.user.username }}" class="provider-avatar">
+                        {% else %}
+                        <div class="provider-avatar" style="background: #2a2a2a; display: flex; align-items: center; justify-content: center; font-size: 4rem;">👤</div>
+                        {% endif %}
+                        <div class="verified-badge">✓</div>
+                    </div>
+                    
+                    <a href="{% url 'book_provider' provider.id %}" class="book-btn">Book Now</a>
+                    <a href="{% url 'provider_detail' provider.id %}" class="view-profile-btn">View Profile</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <p>No providers are currently available in this category.</p>
+                <p>Please check back later or try another category.</p>
+                <a href="{% url 'services' %}">← Back to Services</a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- STICKY TOP RECOMMENDED BOX -->
+        {% if top_recommended %}
+        <aside class="sticky-recommendation">
+            {% if top_recommended.profile_pic %}
+            <img src="{{ top_recommended.profile_pic.url }}" alt="{{ top_recommended.user.username }}" class="rec-avatar">
+            {% else %}
+            <div class="rec-avatar" style="background: #333; display: flex; justify-content: center; align-items: center; font-size: 3rem;">👤</div>
+            {% endif %}
+            
+            <div class="rec-info">
+                <h3 class="rec-name">{{ top_recommended.user.first_name }}</h3>
+                <div class="rec-rating">
+                    ★ {{ top_recommended.calculated_rating|floatformat:1 }} 
+                    <span class="rec-stat">({{ top_recommended.review_count }} Reviews)</span>
+                </div>
+                <div style="font-size: 1.5rem; color: var(--primary-color); font-weight: bold; margin-bottom: 1rem;">
+                    ₹{{ top_recommended.price_per_hour }}/hr
+                </div>
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Based on actual verified customer bookings and ratings, {{ top_recommended.user.first_name }} is the highest-rated professional in this category.
                 </p>
-
-                <div class="provider-badges">
-                    {% if "Women" in provider.category.name %}
-                    <span class="badge">💇 Hair Styling</span>
-                    <span class="badge">💄 Makeup</span>
-                    <span class="badge">✨ Facial</span>
-                    {% elif "Men" in provider.category.name %}
-                    <span class="badge">✂️ Classic Cuts</span>
-                    <span class="badge">🧔 Beard Grooming</span>
-                    <span class="badge">🪒 Hot Towel</span>
-                    {% elif "Cleaning" in provider.category.name %}
-                    <span class="badge">🧹 Deep Cleaning</span>
-                    <span class="badge">🌿 Eco-Friendly</span>
-                    <span class="badge">📦 Move-in/out</span>
-                    {% elif "Electrician" in provider.category.name %}
-                    <span class="badge">⚡ Wiring</span>
-                    <span class="badge">🔌 Circuit Repair</span>
-                    <span class="badge">🛡️ Safety</span>
-                    {% elif "Painting" in provider.category.name %}
-                    <span class="badge">🏠 Interior</span>
-                    <span class="badge">🏡 Exterior</span>
-                    <span class="badge">🎨 Texture Work</span>
-                    {% elif "AC" in provider.category.name %}
-                    <span class="badge">🔧 Repair</span>
-                    <span class="badge">❄️ Installation</span>
-                    <span class="badge">🔄 Maintenance</span>
-                    {% else %}
-                    <span class="badge">✅ Professional</span>
-                    <span class="badge">⭐ Quality Work</span>
-                    {% endif %}
-                </div>
-
-                <div class="provider-contact">
-                    <div class="contact-item">
-                        <span class="contact-icon">📱</span>
-                        <span class="contact-value">{{ provider.contact_number }}</span>
-                    </div>
-                    <div class="contact-item">
-                        <span class="contact-icon">📍</span>
-                        <span class="contact-value">{{ provider.address|truncatewords:5 }}</span>
-                    </div>
-                </div>
+                
+                <a href="{% url 'provider_detail' top_recommended.id %}" class="book-btn" style="width: 100%; box-sizing: border-box;">
+                    Book Top Coolie
+                </a>
             </div>
-
-            <div class="provider-image-section">
-                <div class="provider-avatar-wrapper">
-                    {% if provider.profile_pic %}
-                    <img src="{{ provider.profile_pic.url }}" alt="{{ provider.user.username }}"
-                        class="provider-avatar">
-                    {% else %}
-                    <div class="provider-avatar"
-                        style="display:flex; align-items:center; justify-content:center; color:#666; font-size:4rem;">
-                        👤
-                    </div>
-                    {% endif %}
-                    <div class="verified-badge">✓</div>
-                </div>
-                <a href="{% url 'provider_detail' provider.id %}" class="book-btn">📅 Book Now</a>
-                <a href="{% url 'provider_detail' provider.id %}" class="view-profile-btn">👤 View Profile</a>
-            </div>
-        </div>
-        {% empty %}
-        <div class="empty-state">
-            <div class="empty-state-icon">🔍</div>
-            <p>No providers found in this category yet.</p>
-            <a href="{% url 'services' %}">🏠 Browse other categories</a>
-        </div>
-        {% endfor %}
+        </aside>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

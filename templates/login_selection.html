@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Cool-E{% endblock %}
+
+{% block content %}
+<style>
+    .login-gateway {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: radial-gradient(circle at center, rgba(0, 230, 118, 0.05) 0%, transparent 70%);
+    }
+
+    .gateway-container {
+        max-width: 900px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .login-card {
+        background: var(--surface-color);
+        border: 2px solid #333;
+        border-radius: 24px;
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
+        transform: translateX(-100%);
+        transition: 0.6s;
+    }
+
+    .login-card:hover::before {
+        transform: translateX(100%);
+    }
+
+    .login-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary-color);
+        box-shadow: 0 20px 40px rgba(0, 230, 118, 0.15);
+    }
+
+    .card-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .login-card h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: #fff;
+    }
+
+    .customer-card h2 { color: var(--primary-color); }
+    .partner-card h2 { color: #3b82f6; }
+
+    .login-card p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .login-btn {
+        display: inline-block;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .customer-btn {
+        background: var(--primary-color);
+        color: #000;
+        box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+    }
+
+    .partner-btn {
+        background: #3b82f6;
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .login-card:hover .login-btn {
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+        .gateway-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="login-gateway">
+    <div class="gateway-container">
+        <!-- Customer Login -->
+        <a href="{% url 'login' %}?role=customer" class="login-card customer-card">
+            <span class="card-icon">🏠</span>
+            <h2>Customer Login</h2>
+            <p>I want to book a service, find professionals, and manage my orders.</p>
+            <span class="login-btn customer-btn">Login as User</span>
+        </a>
+
+        <!-- Partner Login -->
+        <a href="{% url 'login' %}?role=partner" class="login-card partner-card">
+            <span class="card-icon">💼</span>
+            <h2>Partner Login</h2>
+            <p>I want to provide services, accept new jobs, and manage my earnings.</p>
+            <span class="login-btn partner-btn">Login as Partner</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

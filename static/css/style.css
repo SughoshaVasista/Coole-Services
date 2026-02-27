@@ -1,27 +1,26 @@
 /* === Global Styles === */
 :root {
-    --primary-color: #00e676;
-    /* Bright Green */
-    --primary-hover: #00c853;
-    --secondary-color: #424242;
-    --secondary-hover: #616161;
-    --background-color: #000000;
-    /* Black Background */
-    --surface-color: #121212;
-    /* Dark Surface */
+    --primary-color: #00ff88;
+    /* Vibrant Chrome Green */
+    --primary-hover: #00ff88;
+    --secondary-color: #0a0a0a;
+    --secondary-hover: #1a1a1a;
+    --background-color: #0c0c0c;
+    --surface-color: #1a1a1a;
+    --bg-card: #1e1e1e;
+    --bg-hover: #252525;
+    --border-color: #333333;
     --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --accent-color: #00e676;
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-accent: 'Inter', sans-serif;
+    --text-secondary: #a0a0a0;
+    --accent-color: #ff3366;
+    --font-family: 'DM Sans', -apple-system, sans-serif;
+    --font-accent: 'Space Mono', monospace;
     --spacing-base: 1rem;
     --border-radius: 8px;
-    --shadow-sm: 0 2px 4px rgba(0, 230, 118, 0.1);
-    --shadow-md: 0 4px 6px rgba(0, 230, 118, 0.1);
+    --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.5);
     --header-height: 70px;
     --transition-base: all 0.3s ease;
-    --bg-card: #121212;
-    --border-color: #333;
 }
 
 * {
@@ -42,9 +41,9 @@ body {
 }
 
 a {
-    text-decoration: none;
+    text-decoration: none !important;
     color: inherit;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 ul {
@@ -170,38 +169,44 @@ p {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
-    color: #000;
-    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3) !important;
+    outline: none !important;
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-hover);
+    background-color: var(--primary-hover) !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5) !important;
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
-    color: #fff;
+    background-color: var(--accent-color) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3) !important;
 }
 
 .btn-secondary:hover {
-    background-color: var(--secondary-hover);
+    background-color: #ff1a53 !important;
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 51, 102, 0.5) !important;
 }
 
 .btn-outline {
-    background: transparent;
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
+    background-color: var(--primary-color) !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3) !important;
 }
 
 .btn-outline:hover {
-    background-color: var(--primary-color);
-    color: #000;
+    background-color: var(--primary-hover) !important;
+    color: #000 !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5) !important;
 }
 
 /* === Header === */
@@ -235,35 +240,22 @@ p {
     text-shadow: 0 0 20px rgba(0, 230, 118, 0.5);
 }
 
-.site-nav ul {
-    display: flex;
-    gap: 2rem;
-}
-
 .site-nav a {
     font-weight: 500;
     color: var(--text-secondary);
     position: relative;
-    padding: 0.5rem 0;
-}
-
-.site-nav a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--primary-color);
-    transition: width 0.3s ease;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
 }
 
 .site-nav a:hover {
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
+    background: rgba(255, 255, 255, 0.03);
 }
 
-.site-nav a:hover::after {
-    width: 100%;
+.site-nav a::after {
+    display: none !important;
+    /* Fixed redundant underlining */
 }
 
 .header-actions {
@@ -428,9 +420,9 @@ p {
 .card {
     background-color: var(--surface-color);
     padding: 2rem;
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    border: 2px solid #333;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
     color: var(--text-primary);
     transition: all 0.3s ease;
 }

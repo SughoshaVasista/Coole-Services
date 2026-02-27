@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
+from datetime import timedelta
 
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -41,6 +43,13 @@ class ServiceProvider(models.Model):
         status_display = self.get_status_display()
         return f"{self.user.username} - {category_name} ({status_display})"
 
+    @property
+    def is_trending(self):
+        """Returns True if the provider had > 3 bookings in the last 7 days."""
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        recent_bookings = self.bookings.filter(booking_date__gte=seven_days_ago).count()
+        return recent_bookings >= 3
+
 class Job(models.Model):
     """Represents a service listed by a provider or requested by a user"""
     title = models.CharField(max_length=200)
@@ -56,9 +65,12 @@ class Job(models.Model):
 
 class Booking(models.Model):
     STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('confirmed', 'Confirmed'),
-        ('completed', 'Completed'),
+        ('pending', 'Requested (Waiting for Partner)'),
+        ('accepted', 'Accepted (Waiting for OTP)'),
+        ('confirmed', 'In Progress (Work Started)'),
+        ('service_done', 'Service Done (Awaiting Payment)'),
+        ('paid', 'Paid (Awaiting Verification)'),
+        ('completed', 'Finished & Paid'),
         ('cancelled', 'Cancelled'),
     )
 
@@ -70,6 +82,7 @@ class Booking(models.Model):
     notes = models.TextField(blank=True, help_text="Additional details from the user")
     selected_services = models.TextField(blank=True, null=True, help_text="List of services selected by the user")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    start_otp = models.CharField(max_length=6, blank=True, null=True)
     
     # Pricing Details
     final_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

@@ -8,7 +8,12 @@ from services.models import ServiceProvider
 @login_required
 def order_list_view(request):
     bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'orders.html', {'bookings': bookings})
+    context = {'bookings': bookings}
+    
+    if request.headers.get('HX-Request'):
+        return render(request, 'orders_partial.html', context)
+        
+    return render(request, 'orders.html', context)
 
 @login_required
 @require_POST

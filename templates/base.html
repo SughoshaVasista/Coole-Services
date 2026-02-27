@@ -9,6 +9,15 @@
     <meta name="keywords" content="services, professionals, booking, home repair, cleaning, tech support">
     <title>{% block title %}Cool-E - Professional Services Platform{% endblock %}</title>
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- HTMX for Real-time Updates -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- SweetAlert2 for Premium Notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Preconnect to Google Fonts for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,47 +31,67 @@
 
     <style>
         :root {
-            /* Color System */
+            /* Default Dark Theme (User Preferred) */
             --primary: #00ff88;
             --primary-dark: #00cc6a;
             --primary-glow: rgba(0, 255, 136, 0.3);
             --secondary: #0a0a0a;
             --accent: #ff3366;
 
-            /* Backgrounds */
+            /* Adaptive Variables */
             --bg-primary: #0d0d0d;
             --bg-secondary: #1a1a1a;
             --bg-card: #151515;
             --bg-hover: #1f1f1f;
-
-            /* Text */
             --text-primary: #ffffff;
             --text-secondary: #a0a0a0;
             --text-muted: #666666;
-
-            /* Borders & Shadows */
             --border-color: #2a2a2a;
+            --header-bg: rgba(13, 13, 13, 0.95);
+
+            /* Fixed Constants */
             --border-radius: 12px;
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
             --shadow-glow: 0 0 20px var(--primary-glow);
-
-            /* Typography */
             --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-accent: 'Space Mono', monospace;
-
-            /* Spacing */
             --spacing-xs: 0.5rem;
             --spacing-sm: 1rem;
             --spacing-md: 1.5rem;
             --spacing-lg: 2rem;
             --spacing-xl: 3rem;
-
-            /* Transitions */
             --transition-fast: 0.15s ease;
             --transition-base: 0.3s ease;
             --transition-slow: 0.5s ease;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #f1f3f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted: #868e96;
+            --border-color: #dee2e6;
+            --header-bg: rgba(248, 249, 250, 0.95);
+            --secondary: #f1f3f5;
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Fix Calendar Icon Visibility */
+        input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        [data-theme="light"] input::-webkit-calendar-picker-indicator {
+            filter: invert(0);
         }
 
         * {
@@ -91,7 +120,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(13, 13, 13, 0.95);
+            background: var(--header-bg);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-color);
             padding: var(--spacing-sm) 0;
@@ -123,12 +152,12 @@
         .site-nav ul {
             display: flex;
             list-style: none;
-            gap: var(--spacing-md);
+            gap: 1.5rem;
         }
 
         .site-nav a {
             color: var(--text-secondary);
-            text-decoration: none;
+            text-decoration: none !important;
             font-weight: 500;
             font-size: 0.95rem;
             padding: 0.5rem 1rem;
@@ -142,20 +171,9 @@
             background: var(--bg-hover);
         }
 
+        /* Fixed double underlining by removing redundant pseudo-elements */
         .site-nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: var(--transition-base);
-            transform: translateX(-50%);
-        }
-
-        .site-nav a:hover::after {
-            width: 80%;
+            display: none !important;
         }
 
         .header-actions {
@@ -181,26 +199,30 @@
 
         .btn-primary {
             background: var(--primary);
-            color: var(--secondary);
-            box-shadow: var(--shadow-glow);
+            color: #000;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            border: 1px solid var(--primary);
         }
 
         .btn-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 0 30px var(--primary-glow);
+            box-shadow: 0 8px 25px var(--primary-glow);
+            color: #000;
         }
 
         .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
+            background: var(--primary);
+            color: #000;
+            border: 1px solid var(--primary);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .btn-outline:hover {
-            background: var(--primary);
-            color: var(--secondary);
+            background: var(--primary-dark);
+            color: #000;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--primary-glow);
         }
 
         .btn-secondary {
@@ -445,6 +467,21 @@
         .text-muted {
             color: var(--text-muted);
         }
+        /* Bootstrap-like Utility Shorthands */
+        .p-3 { padding: 1rem !important; }
+        .bg-warning { background-color: #fbbf24 !important; }
+        .text-dark { color: #000 !important; }
+        .badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -453,16 +490,17 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <a href="{% url 'home' %}" class="logo" aria-label="Cool-E Home">Cool-E</a>
+            <a href="http://127.0.0.1:8000{% url 'home' %}" class="logo" aria-label="Cool-E Home">Cool-E</a>
 
             <nav class="site-nav" aria-label="Main navigation">
                 <ul>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'services' %}">Services</a></li>
+                    <li><a href="http://127.0.0.1:8000{% url 'home' %}">Home</a></li>
+                    <li><a href="http://127.0.0.1:8000{% url 'services' %}">Services</a></li>
+                    <li><a href="http://127.0.0.1:8000{% url 'recommendations' %}" style="color: var(--primary); font-weight: 700;">★ Top Rated</a></li>
                     {% if user.is_authenticated %}
-                        <li><a href="{% url 'orders' %}">My Orders</a></li>
+                        <li><a href="http://127.0.0.1:8000{% url 'orders' %}">My Orders</a></li>
                         {% if user.service_provider %}
-                            <li><a href="{% url 'partner_dashboard' %}">Partner Dashboard</a></li>
+                            <li><a href="http://127.0.0.1:8001{% url 'partner_dashboard' %}">Partner Dashboard</a></li>
                         {% endif %}
                     {% endif %}
                     <li><a href="{% url 'about' %}">About</a></li>
@@ -471,15 +509,20 @@
             </nav>
 
             <div class="header-actions">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="btn btn-outline" style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem;" title="Toggle Dark/Light Mode">
+                    <span id="theme-icon">🌙</span>
+                </button>
+
                 {% if user.is_authenticated %}
-                <a href="{% url 'profiles' %}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Profile</a>
+                <a href="{% url 'profiles' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Profile</a>
                 <form action="{% url 'logout' %}" method="post" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem;">Logout</button>
                 </form>
                 {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Login</a>
-                <a href="{% url 'signup' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Sign Up</a>
+                <a href="{% url 'login_selection' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Login</a>
+                <a href="{% url 'signup_selection' %}" class="btn btn-primary" style="padding: 0.5rem 1rem;">Sign Up</a>
                 {% endif %}
             </div>
         </div>
@@ -511,13 +554,13 @@
                 <div class="footer-links">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="{% url 'home' %}">Home</a></li>
-                        <li><a href="{% url 'services' %}">Services</a></li>
+                        <li><a href="http://127.0.0.1:8000{% url 'home' %}">Home</a></li>
+                        <li><a href="http://127.0.0.1:8000{% url 'services' %}">Services</a></li>
                         {% if user.is_authenticated and user.service_provider %}
-                            <li><a href="{% url 'partner_dashboard' %}">Partner Dashboard</a></li>
+                            <li><a href="http://127.0.0.1:8001{% url 'partner_dashboard' %}">Partner Dashboard</a></li>
                         {% endif %}
-                        <li><a href="{% url 'about' %}">About Us</a></li>
-                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="http://127.0.0.1:8000{% url 'about' %}">About Us</a></li>
+                        <li><a href="http://127.0.0.1:8000{% url 'contact' %}">Contact</a></li>
                         <li><a href="{% url 'terms' %}">Terms & Conditions</a></li>
                     </ul>
                 </div>
@@ -536,10 +579,25 @@
         </div>
     </footer>
 
-
-
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-theme', savedTheme);
+        if (themeIcon) themeIcon.innerText = savedTheme === 'dark' ? '🌙' : '☀️';
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const current = htmlElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                htmlElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                if (themeIcon) themeIcon.innerText = next === 'dark' ? '🌙' : '☀️';
+            });
+        }
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
-
 </html>

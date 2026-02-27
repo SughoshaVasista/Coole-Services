@@ -11,7 +11,7 @@
         <!-- Search Bar -->
         <div style="max-width: 600px; margin: 2rem auto;">
             <form action="{% url 'services' %}" method="get"
-                style="display: flex; gap: 0.5rem; background: rgba(18, 18, 18, 0.8); padding: 0.5rem; border-radius: 8px; border: 1px solid #333;">
+                style="display: flex; gap: 0.5rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
                 <input type="text" name="q" placeholder="Search for jobs or services..."
                     style="flex: 1; padding: 0.8rem; border: none; font-size: 1rem; border-radius: 4px; background: transparent; color: white;">
                 <button type="submit" class="btn btn-primary">Search</button>
@@ -29,24 +29,24 @@
         <h2 class="text-center mb-4" style="color: var(--primary);">Popular Categories</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
             <a href="{% url 'services' %}?category=Electrician" class="card text-center"
-                style="display: block; transition: all 0.3s ease; text-decoration: none;">
-                <h3 class="text-primary mb-1">⚡ Electrician</h3>
-                <p class="text-secondary">Wiring & Fixes</p>
+                style="display: block; transition: all 0.3s ease; text-decoration: none; background: rgba(0, 255, 136, 0.1); border: 2px solid var(--primary); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,255,136,0.15);">
+                <h3 class="text-primary mb-1" style="color: var(--text-primary) !important;">⚡ Electrician</h3>
+                <p class="text-secondary" style="color: var(--text-secondary) !important; font-weight: 500;">Wiring & Fixes</p>
             </a>
             <a href="{% url 'services' %}?category=Cleaning" class="card text-center"
-                style="display: block; transition: all 0.3s ease; text-decoration: none;">
-                <h3 class="text-primary mb-1">🧹 Cleaning</h3>
-                <p class="text-secondary">Deep House Cleaning</p>
+                style="display: block; transition: all 0.3s ease; text-decoration: none; background: rgba(0, 255, 136, 0.1); border: 2px solid var(--primary); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,255,136,0.15);">
+                <h3 class="text-primary mb-1" style="color: var(--text-primary) !important;">🧹 Cleaning</h3>
+                <p class="text-secondary" style="color: var(--text-secondary) !important; font-weight: 500;">Deep House Cleaning</p>
             </a>
             <a href="{% url 'services' %}?category=InstaHelp" class="card text-center"
-                style="display: block; transition: all 0.3s ease; text-decoration: none;">
-                <h3 class="text-primary mb-1">🆘 InstaHelp</h3>
-                <p class="text-secondary">Emergency Repairs</p>
+                style="display: block; transition: all 0.3s ease; text-decoration: none; background: rgba(0, 255, 136, 0.1); border: 2px solid var(--primary); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,255,136,0.15);">
+                <h3 class="text-primary mb-1" style="color: var(--text-primary) !important;">🆘 InstaHelp</h3>
+                <p class="text-secondary" style="color: var(--text-secondary) !important; font-weight: 500;">Emergency Repairs</p>
             </a>
             <a href="{% url 'services' %}?category=Salon" class="card text-center"
-                style="display: block; transition: all 0.3s ease; text-decoration: none;">
-                <h3 class="text-primary mb-1">💇 Beauty & Salon</h3>
-                <p class="text-secondary">Styling & Grooming</p>
+                style="display: block; transition: all 0.3s ease; text-decoration: none; background: rgba(0, 255, 136, 0.1); border: 2px solid var(--primary); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,255,136,0.15);">
+                <h3 class="text-primary mb-1" style="color: var(--text-primary) !important;">💇 Beauty & Salon</h3>
+                <p class="text-secondary" style="color: var(--text-secondary) !important; font-weight: 500;">Styling & Grooming</p>
             </a>
         </div>
     </div>

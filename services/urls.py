@@ -16,5 +16,8 @@ urlpatterns = [
     path('payment/initiate/<int:booking_id>/', views.initiate_payment, name='initiate_payment'),
     path('payment/upi/<int:booking_id>/', views.pay_via_upi, name='pay_via_upi'),
     path('payment-callback/', views.payment_callback, name='payment_callback'),
+    path('webhook/razorpay/', views.razorpay_webhook, name='razorpay_webhook'),
+    path('receipt/<int:booking_id>/', views.view_receipt, name='view_receipt'),
+    path('rebook/<int:booking_id>/', views.rebook_view, name='rebook'),
 ]
 

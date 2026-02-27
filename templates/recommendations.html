@@ -1,0 +1,534 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Top Recommendations - Cool-E{% endblock %}
+
+{% block content %}
+
+<style>
+    .recommendations-page {
+        padding: 4rem 1rem 6rem;
+    }
+
+    .recommendations-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        animation: fadeInDown 0.6s ease-out;
+    }
+
+    .recommendations-header h1 {
+        font-size: 3.5rem;
+        color: var(--text-primary);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .recommendations-header h1 span {
+        font-size: 3rem;
+    }
+
+    .recommendations-header p {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .recommendations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2.5rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .rec-card {
+        background: linear-gradient(145deg, #1e1e1e, #151515);
+        border: 2px solid var(--primary-color);
+        border-radius: 24px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 255, 136, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: scaleIn 0.6s ease-out backwards;
+    }
+
+    .rec-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 255, 136, 0.25);
+    }
+
+    .rec-card::before {
+        content: '🏆 \#1 ' attr(data-category);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: var(--primary-color);
+        color: #000;
+        font-weight: 800;
+        padding: 0.6rem;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .rec-avatar-wrapper {
+        margin: 2rem auto 1.5rem;
+        position: relative;
+        width: 140px;
+        height: 140px;
+    }
+
+    .rec-avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 5px solid var(--primary-color);
+        object-fit: cover;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s ease;
+    }
+
+    .rec-card:hover .rec-avatar {
+        transform: scale(1.08);
+    }
+
+    .status-badges {
+        position: absolute;
+        top: -15px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        z-index: 10;
+        align-items: flex-end;
+    }
+
+    .trending-badge {
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+        animation: pulse-red 2s infinite;
+    }
+
+    .tier-badge {
+        color: #000;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .tier-elite { background: linear-gradient(135deg, #FFD700, #FDB931); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+    .tier-top { background: linear-gradient(135deg, #C0C0C0, #E8E8E8); box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4); }
+    .tier-rising { background: linear-gradient(135deg, var(--primary), #00cc6a); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4); }
+
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(255, 65, 108, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
+    }
+
+    .rec-name {
+        font-size: 1.8rem;
+        color: white;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .rec-rating {
+        color: #ffd700;
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 215, 0, 0.1);
+        display: inline-flex;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .rec-stat {
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .rec-details {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .rec-price {
+        font-size: 1.6rem;
+        color: var(--primary-color);
+        font-weight: 800;
+    }
+    
+    .rec-jobs {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .rec-desc {
+        color: #aaa;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .action-btn {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        background: var(--primary-color);
+        color: #000;
+        font-weight: 800;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .action-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--surface-color);
+        border-radius: 20px;
+        border: 2px dashed #333;
+        grid-column: 1 / -1;
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+    }
+
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Quick Filters Navigation */
+    .filter-nav {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+        padding: 0 1rem;
+    }
+
+    .filter-pill {
+        background: var(--surface-color);
+        color: var(--text-secondary);
+        border: 2px solid #333;
+        padding: 0.6rem 1.5rem;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: capitalize;
+    }
+
+    .filter-pill:hover, .filter-pill.active {
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+    }
+
+    /* Verified Identity Badge */
+    .verified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(29, 161, 242, 0.1);
+        color: #1DA1F2;
+        border: 1px solid rgba(29, 161, 242, 0.3);
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+    }
+
+    @media (max-width: 768px) {
+        .recommendations-header h1 {
+            font-size: 2.5rem;
+        }
+        .filter-nav {
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        .filter-pill {
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<div class="container recommendations-page">
+    <div class="recommendations-header">
+        <h1><span>⭐</span> Top Recommended Professionals</h1>
+        <p>We've analyzed actual customer reviews and booking history to present you with the absolute best service providers in each category.</p>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="filter-nav" id="category-filters">
+        <button class="filter-pill active" data-filter="all">All Categories</button>
+        <!-- Categories will be dynamically injected here via JS to only show populated ones -->
+    </div>
+
+    {% if personalized_rec %}
+    <div style="margin-bottom: 4rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--primary), transparent);"></div>
+            <h2 style="color: var(--primary); font-size: 1.5rem; white-space: nowrap; margin: 0;">💡 Because you recently booked {{ personalized_rec.reason_category }}</h2>
+            <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--primary), transparent);"></div>
+        </div>
+
+        <div class="recommendations-grid" style="display: flex; justify-content: center;">
+            <div class="rec-card" data-category="{{ personalized_rec.data.category.name }}" style="transform: scale(1.05); border-color: var(--primary); box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);">
+                <div class="rec-avatar-wrapper">
+                    <div class="status-badges">
+                        <div class="tier-badge tier-elite" style="background: linear-gradient(135deg, #1DA1F2, #00C6FF); color: white; box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);">✨ Top Match For You</div>
+                        
+                        {% if personalized_rec.data.provider.is_trending %}
+                        <div class="trending-badge">🔥 Trending</div>
+                        {% endif %}
+                    </div>
+                
+                    {% if personalized_rec.data.provider.profile_pic %}
+                    <img src="{{ personalized_rec.data.provider.profile_pic.url }}" alt="{{ personalized_rec.data.provider.user.username }}" class="rec-avatar">
+                    {% else %}
+                    <div class="rec-avatar" style="background: #333; display: flex; justify-content: center; align-items: center; font-size: 4rem;">👤</div>
+                    {% endif %}
+                </div>
+
+                <h2 class="rec-name">
+                    {{ personalized_rec.data.provider.user.first_name }} {{ personalized_rec.data.provider.user.last_name }}
+                    <span class="verified-badge">✓ Verified ID</span>
+                </h2>
+                
+                <div style="text-align: center;">
+                    <div class="rec-rating">
+                        ★ {{ personalized_rec.data.provider.calculated_rating|floatformat:1 }} 
+                        <span class="rec-stat">({{ personalized_rec.data.provider.review_count }} Reviews)</span>
+                    </div>
+                </div>
+
+                <div class="rec-details">
+                    <div class="rec-price">₹{{ personalized_rec.data.provider.price_per_hour }}/hr</div>
+                    <div class="rec-jobs">✓ {{ personalized_rec.data.provider.bookings.count }} Successfully Completed Jobs</div>
+                    <p class="rec-desc" style="margin-bottom: 0;">Users who book <strong>{{ personalized_rec.reason_category }}</strong> often need top-rated experts in <strong>{{ personalized_rec.data.category.name }}</strong>.</p>
+                    
+                    <div class="category-info" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #333; text-align: left;">
+                        <p style="color: var(--primary-color); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.5rem; font-weight: 800;">📁 Category Details</p>
+                        <p style="color: #fff; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.4rem;">{{ personalized_rec.data.category.name }}</p>
+                        {% if personalized_rec.data.category.description %}
+                        <p style="color: #999; font-size: 0.85rem; line-height: 1.5; margin-bottom: 0.8rem;">{{ personalized_rec.data.category.description|truncatewords:25 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <a href="{% url 'provider_detail' personalized_rec.data.provider.id %}" class="action-btn">
+                    Book Professional
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem;">
+        <div style="flex-grow: 1; height: 1px; background: #333;"></div>
+        <h3 style="color: var(--text-secondary); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;">Other Top Recommendations</h3>
+        <div style="flex-grow: 1; height: 1px; background: #333;"></div>
+    </div>
+    {% endif %}
+
+    <div class="recommendations-grid" id="main-rec-grid">
+        {% for item in recommended_list %}
+        <div class="rec-card" data-category="{{ item.category.name }}" style="animation-delay: {{ forloop.counter0|add:1 }}00ms;">
+            
+            <div class="rec-avatar-wrapper">
+                <div class="status-badges">
+                    {% if item.provider.is_trending %}
+                    <div class="trending-badge">🔥 Trending</div>
+                    {% endif %}
+                    
+                    {% if item.algorithm_score >= 4.8 and item.provider.review_count >= 10 %}
+                    <div class="tier-badge tier-elite">👑 Elite Pro</div>
+                    {% elif item.algorithm_score >= 4.5 and item.provider.review_count >= 5 %}
+                    <div class="tier-badge tier-top">⭐ Top Pro</div>
+                    {% elif item.algorithm_score >= 4.0 %}
+                    <div class="tier-badge tier-rising">📈 Rising Star</div>
+                    {% endif %}
+                </div>
+            
+                {% if item.provider.profile_pic %}
+                <img src="{{ item.provider.profile_pic.url }}" alt="{{ item.provider.user.username }}" class="rec-avatar">
+                {% else %}
+                <div class="rec-avatar" style="background: #333; display: flex; justify-content: center; align-items: center; font-size: 4rem;">👤</div>
+                {% endif %}
+            </div>
+
+            <h2 class="rec-name">
+                {{ item.provider.user.first_name }} {{ item.provider.user.last_name }}
+                <span class="verified-badge">✓ Verified ID</span>
+            </h2>
+            
+            <div style="text-align: center;">
+                <div class="rec-rating">
+                    ★ {{ item.provider.calculated_rating|floatformat:1 }} 
+                    <span class="rec-stat">({{ item.provider.review_count }} Reviews)</span>
+                </div>
+            </div>
+
+            <div class="rec-details">
+                <div class="rec-price">₹{{ item.provider.price_per_hour }}/hr</div>
+                <div class="rec-jobs">✓ {{ item.provider.bookings.count }} Successfully Completed Jobs</div>
+                <p class="rec-desc" style="margin-bottom: 0;">This professional consistently maintains the highest quality standards and customer satisfaction in the <strong>{{ item.category.name }}</strong> category.</p>
+                
+                <div class="category-info" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #333; text-align: left;">
+                    <p style="color: var(--primary-color); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.5rem; font-weight: 800;">📁 Category Details</p>
+                    <p style="color: #fff; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.4rem;">{{ item.category.name }}</p>
+                    {% if item.category.description %}
+                    <p style="color: #999; font-size: 0.85rem; line-height: 1.5; margin-bottom: 0.8rem;">{{ item.category.description|truncatewords:25 }}</p>
+                    {% endif %}
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: rgba(0, 255, 136, 0.1); color: var(--primary-color); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">★ Ranked #1</span>
+                        <span style="color: #666; font-size: 0.8rem;">out of {{ item.category.providers.count }} active providers</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{% url 'provider_detail' item.provider.id %}" class="action-btn">
+                Book Professional
+            </a>
+        </div>
+        {% empty %}
+        <div class="empty-state" id="empty-state">
+            <div class="empty-icon">📊</div>
+            <h2>Building Recommendations</h2>
+            <p style="color: #aaa; font-size: 1.1rem; margin-top: 1rem;">
+                Our recommendation engine is currently gathering customer reviews. <br>
+                Check back soon to see the top-rated professionals!
+            </p>
+            <a href="{% url 'services' %}" class="action-btn" style="display: inline-block; width: auto; margin-top: 2rem; padding: 1rem 3rem;">
+                Browse All Services
+            </a>
+        </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const grid = document.getElementById('main-rec-grid');
+        const cards = grid.querySelectorAll('.rec-card:not(.empty-state)');
+        const filterNav = document.getElementById('category-filters');
+        const emptyState = document.getElementById('empty-state');
+        
+        // 1. Extract unique categories that actually have recommendations
+        const uniqueCategories = new Set();
+        cards.forEach(card => {
+            uniqueCategories.add(card.getAttribute('data-category'));
+        });
+
+        // 2. Build the exact filter pills dynamically
+        uniqueCategories.forEach(category => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-pill';
+            btn.setAttribute('data-filter', category);
+            btn.textContent = category;
+            filterNav.appendChild(btn);
+        });
+
+        // 3. Add filtering logic
+        const buttons = filterNav.querySelectorAll('.filter-pill');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filterValue = btn.getAttribute('data-filter');
+                let visibleCount = 0;
+
+                // Toggle visibility with smooth animation handling
+                cards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                        // Reset animation to replay it
+                        card.style.animation = 'none';
+                        card.offsetHeight; // Trigger reflow
+                        card.style.animation = null; 
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Handle Empty State intelligently
+                if (visibleCount === 0) {
+                    emptyState.style.display = 'block';
+                    const categoryName = filterValue !== 'all' ? filterValue : 'Categories';
+                    emptyState.querySelector('h2').textContent = `Building Recommendations for ${categoryName}`;
+                    emptyState.querySelector('p').innerHTML = `
+                        Our algorithm is strictly analyzing verified reviews for <strong>${categoryName}</strong>.<br>
+                        None have cleared the rigorous "Top Pro" threshold just yet. Check back soon!
+                    `;
+                } else {
+                    emptyState.style.display = 'none';
+                }
+            });
+        });
+
+        // Initial check just in case everything is empty from the start
+        if (cards.length === 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+        }
+    });
+</script>
+
+{% endblock %}

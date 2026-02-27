@@ -5,19 +5,108 @@
 {% block content %}
 <div class="container"
     style="padding: 4rem 1rem; display: flex; justify-content: center; align-items: center; min-height: 60vh;">
-    <div class="card" style="width: 100%; max-width: 450px;">
-        <h2 class="text-center mb-4 text-primary">Create Your Account</h2>
-        <form method="post" class="auth-form">
+    <div class="card" style="width: 100%; max-width: 600px; background: var(--surface-color); border: 2px solid #333; border-radius: 24px; padding: 3rem;">
+        <h2 class="text-center mb-1 text-primary" style="font-weight: 800; font-size: 2.2rem;">
+            {% if role == 'partner' %}Join as Partner{% else %}Create Account{% endif %}
+        </h2>
+        <p class="text-center text-secondary mb-4">
+            {% if role == 'partner' %}Start earning by providing your professional services.{% else %}Get access to thousands of verified professionals.{% endif %}
+        </p>
+
+        <form method="post" class="auth-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 1rem;">Create My Account</button>
+            {% for field in form %}
+                <div class="field-wrapper {% if field.name == 'description' or field.name == 'address' %}full-width{% endif %}" style="margin-bottom: 0.5rem; {% if field.name == 'description' or field.name == 'address' %}grid-column: span 2;{% endif %}">
+                    <label for="{{ field.id_for_label }}" style="font-weight: 600; font-size: 0.85rem; color: #888; text-transform: uppercase; margin-bottom: 0.5rem; display: block;">
+                        {{ field.label }}
+                        {% if field.name == 'current_location' and role == 'partner' %}
+                            <button type="button" onclick="getLocation()" class="btn btn-sm btn-outline-primary" style="float: right; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 4px;">📍 Get Current Location</button>
+                        {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="helptext">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="errorlist">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <div style="grid-column: span 2; margin-top: 1rem;">
+                <button type="submit" id="submit-signup" class="btn btn-primary" style="width: 100%; padding: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+                    Register as {% if role == 'partner' %}Service Provider{% else %}Customer{% endif %}
+                </button>
+            </div>
         </form>
+
+        <script>
+            function getLocation() {
+                const locationBtn = event.target;
+                const originalText = locationBtn.innerText;
+                locationBtn.innerText = "⌛ Detecting Address...";
+                locationBtn.disabled = true;
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            document.querySelector('input[name="latitude"]').value = lat;
+                            document.querySelector('input[name="longitude"]').value = lon;
+                            
+                            try {
+                                // Fetch human readable address from OpenStreetMap (Free, no API key needed)
+                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
+                                    headers: { 'Accept-Language': 'en' }
+                                });
+                                if (!response.ok) throw new Error("API Blocked");
+                                
+                                const data = await response.json();
+                                if (data && data.address) {
+                                    const addr = data.address;
+                                    const parts = [
+                                        addr.suburb || addr.neighbourhood || addr.residential || '',
+                                        addr.city || addr.town || addr.village || '',
+                                        addr.state || ''
+                                    ].filter(p => p !== '').join(', ');
+                                    
+                                    document.querySelector('input[name="current_location"]').value = parts || data.display_name;
+                                    locationBtn.innerText = "✅ Address Captured";
+                                } else if (data && data.display_name) {
+                                    document.querySelector('input[name="current_location"]').value = data.display_name;
+                                    locationBtn.innerText = "✅ Address Captured";
+                                } else {
+                                    throw new Error("No address found");
+                                }
+                            } catch (e) {
+                                console.error("Geocoding error:", e);
+                                document.querySelector('input[name="current_location"]').value = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                                locationBtn.innerText = "⚠️ Coords Only";
+                            }
+                            
+                            locationBtn.style.color = "#00ff88";
+                            locationBtn.style.borderColor = "#00ff88";
+                        },
+                        (error) => {
+                            alert("Unable to retrieve location. Please enter manually.");
+                            locationBtn.innerText = originalText;
+                            locationBtn.disabled = false;
+                        }
+                    );
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                    locationBtn.innerText = originalText;
+                    locationBtn.disabled = false;
+                }
+            }
+        </script>
 
         <style>
             .auth-form p {
                 margin-bottom: 1.5rem;
             }
-            .auth-form input {
+            .auth-form input, .auth-form select, .auth-form textarea {
                 /* Use the global .form-control styles by default if possible, 
                    but since form.as_p is used, we'll force style matching */
                 width: 100%;
@@ -28,7 +117,7 @@
                 color: white;
                 transition: var(--transition-base);
             }
-            .auth-form input:focus {
+            .auth-form input:focus, .auth-form select:focus, .auth-form textarea:focus {
                 outline: none;
                 border-color: var(--primary);
                 background: rgba(255, 255, 255, 0.05);

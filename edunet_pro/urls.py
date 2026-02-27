@@ -16,6 +16,9 @@ urlpatterns = [
     path('profiles/', include('profiles.urls')),
     path('services/', include('services.urls')),
     path('orders/', include('orders.urls')),
+    
+    # Password Reset URLs
+    path('', include('django.contrib.auth.urls')),
 ]
 
 if settings.DEBUG:

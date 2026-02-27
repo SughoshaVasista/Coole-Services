@@ -33,3 +33,35 @@ class SignUpForm(forms.ModelForm):
                 profile.address = self.cleaned_data.get('address', '')
                 profile.save()
         return user
+
+from services.models import ServiceCategory, ServiceProvider
+import uuid
+
+class PartnerSignUpForm(SignUpForm):
+    category = forms.ModelChoiceField(queryset=ServiceCategory.objects.all(), required=True)
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), required=True)
+    price_per_hour = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+    age = forms.IntegerField(required=True)
+    latitude = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    longitude = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    current_location = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={'placeholder': 'e.g. Kondapur, Hyderabad'}))
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        if commit:
+            # Create ServiceProvider entry
+            ServiceProvider.objects.create(
+                user=user,
+                category=self.cleaned_data['category'],
+                description=self.cleaned_data['description'],
+                price_per_hour=self.cleaned_data['price_per_hour'],
+                age=self.cleaned_data['age'],
+                contact_number=self.cleaned_data.get('phone_number', ''),
+                address=self.cleaned_data.get('address', ''),
+                latitude=self.cleaned_data.get('latitude'),
+                longitude=self.cleaned_data.get('longitude'),
+                current_location=self.cleaned_data.get('current_location', ''),
+                service_code=f"PRO-{uuid.uuid4().hex[:6].upper()}",
+                status='available'
+            )
+        return user
